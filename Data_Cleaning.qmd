@@ -1,0 +1,305 @@
+---
+title: "CS Dept Data Cleaning"
+subtitle: "MATH 398 Project — Fall 2025 (2258)"
+author: "Morgan McMurray"
+format:
+  html:
+    df-print: paged
+editor: visual
+knitr:
+  opts_chunk:
+    message: false
+    warning: false
+---
+
+# Research Questions
+
+### RQ1:
+
+Can a student's Hispanic identity, gender identity, transfer status, number of units taken per semester, campus housing status per semester, and/or number of visits to a tutoring center per semester predict/explain whether and when they graduate from a major in the CS program?
+
+### RQ2:
+
+Can a student's Hispanic identity, gender identity, transfer status, number of units taken per semester, campus housing status per semester, and/or number of visits to a tutoring center per semester predict/explain whether and when they attrit from a major in the CS program?
+
+# Initialization
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+library(readxl)
+
+# Read Excel Data
+# Set the max number of rows to use in creating the guess type for each column
+# This helps get rid of warnings about guess types mismatching inputs read from the actual rows
+# The number of rows used to determine column type is the max because our dataset is sparse
+orig_data <- read_excel("CS Major Data 2025-10-10.xlsx", guess_max = min(8400, n_max = NULL))
+
+# View the first 50 rows of the data
+head(orig_data, n = 50)
+```
+
+## First Impressions
+
+Looking at the data after loading it in, a few things are clear:
+
+1.  **There are entirely duplicate rows.** We can confirm this with the following code:
+
+```{r}
+# Display boolean values regarding whether a row is a duplicate of another
+dupes <- duplicated(head(orig_data, n = 50))
+dupes
+
+# Display the sum of duplicated rows
+sum(dupes)
+```
+
+2.  **Within student groups, we have rows describing duplicate terms, but then one other demographic variable column** (usually the Dependent_Income_Code) **was changed.** An example of this is shown below:
+
+```{r}
+# Get distinct rows from the original data,
+# then group those rows by Student number and Term_Code,
+# then append a tally column that counts how many row are in each group and sorts the rows by the groups with the greatest number of rows,
+# (note that if the data was truly clean, then each group should only have one row in it --- one row representing a single, unique term when a student was enrolled)
+# then only show the rows where the number of rows in the group is greater than 1
+# then print out the first 50 rows of this dataset, and all of the columns except the tally column
+(orig_data %>% distinct() %>% group_by(Student, Term_Code) %>% add_tally(sort = TRUE) %>% filter(n > 1))[1:50, 1:ncol(orig_data)]
+```
+
+3.  **We also have student groups where the student took 0 units during their entire time at CSUCI.** This could happen for a variety of reasons:
+
+    -   The student was admitted but then transferred to a different university
+    -   The student was admitted but then decided to take a gap year
+    -   The student was admitted but, for whatever reason, couldn't enroll in courses
+    -   Etc...
+
+    An example of these rows is shown below:
+
+```{r}
+# Get distinct rows from the original data,
+# then group those rows by Student number and Term_Code,
+# then keep only one of the "near-duplicate rows" (the last row of the group),
+# then filter those rows by groups where all rows have Unit_Load < 1
+# then print out the Student, Term_Code, Term_Desc, and Unit_Load columns of the first 50 rows of this filtered dataset
+(orig_data %>% distinct() %>% group_by(Student, Term_Code) %>% slice_tail(n = 1) %>% filter(if_all(Unit_Load, ~ . < 1)))[1:50, c("Student", "Term_Code", "Term_Desc", "Unit_Load")]
+```
+
+Since we're only interested in students who have *attempted* courses at CSUCI as majors offered by the Department of Computer Science, these rows need to be deleted as well. Otherwise, they're just going to be noise in our models.
+
+4.  Lastly, **the time series intervals are irregular.** Some students take courses during the Summer/Winter terms, others only in Fall/Spring, and still others may have gaps depending on whether they took a leave of absence during a certain period of time. We can confirm this through the following code:
+
+```{r}
+# Display the first 3 columns of the first 50 unique, non-near-duplicated rows from the original data
+# These specific columns highlight the time series irregularities
+head(orig_data %>% distinct() %>% group_by(Student, Term_Code) %>% slice_tail(n = 1), n = 50)[, 1:3]
+```
+
+In order to use models for time series analysis (which we need in order to answer our research questions), we will need to both clean up the duplicate rows, ensure that all terms are labelled correctly, *and* adjust the time series intervals so that they are the same. The easiest way to make the time series intervals the same is to add dummy rows such that each student has rows for Fall, Winter, Spring, Summer throughout their time in the CS Department (and CSUCI more broadly), whether or not they were actually enrolled in classes during that time.
+
+The added dummy rows will follow this format:
+
+| Student | Term_Code | Term_Desc | First_CI_Term | First_CI_Term_Desc | First_CS_Term | Is_Hispanic | Gender | Dependent_Income_Code | major1 | major1 Descr | major2 | major2 Descr | major3 | major3 Descr | Is_Transfer | Unit_Load | Lived_On_Campus | Num_Tutoring_Visits | Did_Graduate |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+| Copy of previous entry | ***If previous Term_Desc contained "Winter":*** previous entry + 1; ***Else:*** previous entry + 3 | For the first part, determine the next term in the cycle. Then ***If new Winter term:*** use previous year + 1; ***Else:*** use previous year | Copy of previous entry | Copy of previous entry | Copy of previous entry | Copy of previous entry | Copy of previous entry | Copy of previous entry | Copy of previous entry | Copy of previous entry | Copy of previous entry | Copy of previous entry | Copy of previous entry | Copy of previous entry | Copy of previous entry | 0 | 0 | 0 | Copy of previous entry |
+
+The Term_Code calculations described in the above table are apparent from the data:
+
+```{r}
+# Grab distinct rows from the original data
+# Then group those rows by the "Student" and "Term_Code" columns
+# Then retain the last of the near-duplicate rows
+# Then remove the "Student" and "Term_Code" groups
+# Then separate the "Term_Desc" column into "Term_Period" and "Term_Year" (this helps with filtering)
+# Then regroup rows by "Student"
+# Then filter rows by Students who have taken at least one course during at least one Winter, Spring, Summer, and Fall term
+# Then initialize a new "Dist_From_Prev_Term" column to all 0s
+# Then recombine the "Term_Period" and "Term_Year" columns back into "Term_Desc"
+# Then select all the remaining values from the "Student," "Term_Code," "Term_Desc," and "Dist_From_Prev_Term" columns and save them into a new variable
+all_term_periods <- orig_data %>% distinct() %>% group_by(Student, Term_Code) %>% slice_tail(n = 1) %>% ungroup() %>% separate(Term_Desc, c("Term_Period", "Term_Year")) %>% group_by(Student) %>% filter(any(Term_Period == "Winter") & any(Term_Period == "Spring") & any(Term_Period == "Summer") & any(Term_Period == "Fall")) %>% mutate(Term_Period = paste(Term_Period, Term_Year, sep = " "), Dist_From_Prev_Term = 0) %>% rename(Term_Desc = Term_Period) %>% select(Student, Term_Code, Term_Desc, Dist_From_Prev_Term)
+
+# Calculate the distance between each term code
+# Note that negative distances indicate a new student
+for (curr_row in 2:nrow(all_term_periods)) {
+  all_term_periods[curr_row, "Dist_From_Prev_Term"] <- all_term_periods[curr_row, "Term_Code"] - all_term_periods[curr_row - 1, "Term_Code"] %>% pull()
+}
+
+# Display the first 50 rows of this modified dataset
+all_term_periods[1:50, ]
+```
+
+### There are a few potential problems with the way that this new dummy row data will be represented:
+
+-   ***Gender, major1, major2, and major3 could all be changed during a term when the student is not enrolled in classes***
+    -   We would have no way of knowing whether this happened or not
+-   ***Setting Lived_On_Campus = 0 may also be inaccurate***
+    -   A student *could* have lived on campus during a term when they weren't taking classes because of (on-campus) work, homelessness, etc.
+        -   We would also have no way of knowing whether this happened or not
+
+### That being said, we think adding these rows is the best option
+
+We think this for two main reasons:
+
+1.  Students taking summer and/or winter courses at CSUCI likely influences when they graduate, so removing these rows creates inaccuracies that will affect the inferences we're able to make from our models.
+2.  Our research questions don't focus on how *specific* changes in student housing, gender, and major affect when a student graduates; thus, we decided that we could live with slight inaccuracies regarding these factors.
+
+With all that out of the way, it's time to move on to adding these new rows.
+
+# Adding Dummy Rows
+
+## Data Cleaning
+
+Before we're able to add in new rows to the dataset, we've got to clean it a little. We need to remove:
+
+-   Entirely duplicate rows
+    -   These will be removed with dplyr's "distinct()" function
+-   Rows with duplicate terms belonging to the same student
+    -   I've chosen to retain last of the student rows with duplicate terms, because it's likely that this row has the most recent (and therefore, most accurate) information
+-   Students where all rows belonging to that student have Unit_Load \< 1
+    -   These will be removed with dplyr's "filter()" function
+
+For easier manipulation later, I also decided to rename and reorganize some of the columns.
+
+```{r}
+# Remove duplicates from the original data and store into a new dataframe
+de_duped <- orig_data %>% distinct()
+
+# Retain the last of the "near-duplicate" rows --- this way, there is only one row per term per student
+de_duped <- de_duped %>% group_by(Student, Term_Code) %>% slice_tail(n = 1)
+
+# Remove students where all rows belonging to that student have a Unit_Load < 1
+# We ungroup the previous group_by statement in order to ensure that we're grouping JUST by the Student column before filtering
+de_duped <- de_duped %>% ungroup() %>% group_by(Student) %>% filter(!if_all(Unit_Load, ~ . < 1))
+
+# Rename major description columns to include underscores (makes them easier to work with)
+names(de_duped)[which(colnames(de_duped) == "major1 Descr")] <- "major1_Descr"
+names(de_duped)[which(colnames(de_duped) == "major2 Descr")] <- "major2_Descr"
+names(de_duped)[which(colnames(de_duped) == "major3 Descr")] <- "major3_Descr"
+
+# Move the "Dependent_Income_Code" column to be next to the "Gender" column.  This way, the response variable is at the end of the dataset
+de_duped <- de_duped %>% relocate(Dependent_Income_Code, .after=Gender)
+
+# Display the first 50 entries of the new dataframe
+head(de_duped, n = 50)
+```
+
+Great! Each row in the dataset now has a unique student paired with a unique term, and all students have spent at least one term taking courses as a major offered by the Department of Computer Science.
+
+## Time Interval Regularization
+
+*Now* we can add our dummy rows to regularize the time intervals for each student:
+
+```{r}
+# Make a copy of the de-duped dataset for version control
+data_reg_intervals <- data.frame(de_duped)
+
+# Iterate through the entire dataframe, constructing and adding dummy rows
+# We start at row 2 because we're checking 2 rows in each iteration
+for (curr_row in 2:nrow(data_reg_intervals)) {
+  
+  # Save the index of the previous row because we'll be using it EXTENSIVELY
+  prev_row <- curr_row - 1
+  
+  # Check if the current student is still the same as the previous student
+  # If so, continue with standardizing the time series intervals for that student
+  # Otherwise, skip this iteration
+  if (data_reg_intervals[curr_row, "Student"] == data_reg_intervals[prev_row, "Student"]) {
+    
+    # Get the term descriptions for the previous row and current row, and split them into their semester names (string) and their years (number)
+    # These will be used to calculate the number of new rows
+    prev_term_desc <- str_split_1(data_reg_intervals[prev_row, "Term_Desc"], " ")
+    prev_term_year <- strtoi(prev_term_desc[2])
+    prev_term_sem <- head(prev_term_desc, n = -1)
+    curr_term_desc <- str_split_1(data_reg_intervals[curr_row, "Term_Desc"], " ")
+    curr_term_year <- strtoi(curr_term_desc[2])
+    curr_term_sem <- head(curr_term_desc, n = -1)
+    
+    # Create ideal next term from the previous term, keeping parts of the description split for further comparison
+    ideal_next_term_desc <- ""
+    ideal_next_term_sem <- ""
+    ideal_next_term_year <- prev_term_year
+    
+    if (prev_term_sem == "Fall") {
+      ideal_next_term_sem <- "Winter"
+      ideal_next_term_year <- ideal_next_term_year + 1
+      ideal_next_term_desc <- paste(ideal_next_term_sem, ideal_next_term_year, sep=" ")
+    } else if (prev_term_sem == "Winter") {
+      ideal_next_term_sem <- "Spring"
+      ideal_next_term_desc <- paste(ideal_next_term_sem, ideal_next_term_year, sep=" ")
+    } else if (prev_term_sem == "Spring") {
+      ideal_next_term_sem <- "Summer"
+      ideal_next_term_desc <- paste(ideal_next_term_sem, prev_term_year, sep=" ")
+    } else if (prev_term_sem == "Summer") {
+      ideal_next_term_sem <- "Fall"
+      ideal_next_term_desc <- paste(ideal_next_term_sem, prev_term_year, sep=" ")
+    }
+    
+    # Check if the current term is not the same as the ideal next term
+    # If they're different, calculate how many new rows to add
+    # Of course, if the current term and the ideal next term are the same, do nothing
+    if (paste(curr_term_desc, collapse = " ") != ideal_next_term_desc) {
+      
+      # Choose the appropriate mapping depending on the previous semester
+      # Note that the mapping values are the value of the index - 1
+      mapping <- vector()
+      
+      if (prev_term_sem == "Spring") {
+        mapping <- c("Spring", "Summer", "Fall", "Winter")
+        # Spring = 0, Summer = 1, Fall = 2, Winter = 3
+      } else if (prev_term_sem == "Summer") {
+        mapping <- c("Summer", "Fall", "Winter", "Spring")
+        # Summer = 0, Fall = 1, Winter = 2, Spring = 3
+      } else if (prev_term_sem == "Fall") {
+        mapping <- c("Fall", "Winter", "Spring", "Summer")
+        # Fall = 0, Winter = 1, Spring = 2, Summer = 3
+      } else {
+        mapping <- c("Winter", "Spring", "Summer", "Fall")
+        # Winter = 0, Spring = 1, Summer = 2, Fall = 3
+      }
+      
+      # Calculate the number of new rows
+      # new_rows = 4 * (Year_next - Year_prev) + (Sem_next_mapping - Sem_prev_mapping) - 1
+      num_new_rows <- 4 * (curr_term_year - prev_term_year) + ((which(curr_term_sem == mapping)[[1]] - 1) - (which(prev_term_sem == mapping)[[1]] - 1)) - 1
+      
+      cat("Previous Term_Desc", prev_term_desc, "\nCurrent Term_Desc:", curr_term_desc, "\nIdeal Next Term_Desc:", ideal_next_term_desc, "\nNumber of new rows needed:", num_new_rows, "\n\n")
+    }
+    
+    # cat("Previous Term_Desc", prev_term_desc, "\nCurrent Term_Desc:", curr_term_desc, "\nIdeal Next Term_Desc:", ideal_next_term_desc, "\n\n")
+    
+    #cat("Previous Term_Desc", prev_term_desc, "\nPrevious Term Year:", prev_term_year, "\nPrevious Term Semester:", prev_term_sem, "\n\n")
+    #cat("Current Term_Desc:", curr_term_desc, "\nCurrent Term Year:", curr_term_year, "\nCurrent Term Semester:", curr_term_sem, "\n\n")
+    #cat("Ideal Next Term_Desc:", ideal_next_term_desc, "\nIdeal Next Term Year:", ideal_next_term_year, "\nIdeal Next Term Semester:", ideal_next_term_sem, "\n\n")
+  } else {
+    #print(paste("Row change on current_row", curr_row, "with current student", data_reg_intervals[curr_row, "Student"], "and previous row", prev_row, "with previous student", data_reg_intervals[prev_row, "Student"]))
+    message("Conclude with student ", data_reg_intervals[prev_row, "Student"], "\n")
+    cat("\n\n----------\n\n")
+  }
+}
+```
+
+So far, so good!
+
+# Squaring the data
+
+In addition to regularizing the time intervals, we need to ensure that the number of recorded terms per student is the same for each student, regardless of when the student graduated (or otherwise left) CSUCI. This is another condition of being able to use time series models for our analysis. The easiest way to do this is to add even more dummy rows such that every student has enough records that match the student who has stayed at CSUCI for the longest period of time. Here is how we accomplish this:
+
+```{r}
+# new dataframe with the data squared
+```
+
+# Normalizing Terms
+
+In order for students' academic journeys to be compared on a term-by-term basis, irrespective of when the actual terms happened, we need to normalize the terms into a standard order. The easiest way to do this is to interpret the first term that a student started in their program as "Term 1," the second term as "Term 2", etc. To preserve as much of the original data as possible, we incorporate this ordering by adding a new column with the normalized names:
+
+```{r}
+# new dataframe with Term_Order column added to the right of the "Student" feature
+# export into csv file
+```
+
+# Pivoting the data
+
+Finally, to do additional analysis on the significance of each predictor in our data relative to graduation/attrition, we must pivot the data such that each student has a unique row:
+
+```{r}
+# new dataframe with the data pivoted
+# export into csv file
+```
