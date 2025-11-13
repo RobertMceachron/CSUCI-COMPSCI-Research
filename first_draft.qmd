@@ -10,10 +10,6 @@ format:
     toc: true
     toc-depth: 2
     colorlinks: true
-execute:
-  warning: false
-  message: false
-  include: false
 ---
 
 # Introduction
@@ -22,17 +18,21 @@ Despite ongoing efforts to increase diversity in the technology sector, computer
 
 Thus, the current study will examine demographics among student's enrolled in the Computer Science Program at CSUCI, while painting a holistic picture of the department. Additionally, factors predicting graduation rates among students in the program will expose problem areas necessary for intervention. The findings aim to help CSUCI and similar institutions design targeted interventions to support at-risk computer science students, ultimately contributing to a more diverse and inclusive technology workforce that better serves society as a whole.
 
-
 # Methods
-## Dataset
+
+## Data Set
 
 ```{r}
+#| message: false
+#| warning: false
 library(tidyverse)
 library(plotly)
 ddata <- read.csv("DeDuped_Data.csv")
 ```
 
 ```{r}
+#| message: false
+#| warning: false
 # Removes NA Values and sums rows for each student if over 1
 BinaryChecker <- function(x) { 
               x[is.na(x)] <- 0
@@ -63,20 +63,265 @@ ddata <- ddata %>%
         mutate(Terms_Attended = sum(!is.na(c_across(ends_with("_Unit_Load"))))) %>%
         ungroup()
 ```
-The data set given by the Office of Institutional Research included students enrolled in the Department of Computer Science at California State University Channel Islands (CSUCI). Data included 1,691 students enrolled between Fall 2015 and Fall 2025. 
+
+## Data Structure
+
+#### Data Showcase
+
+The data set given by the Office of Institutional Research included students enrolled in the Department of Computer Science at California State University Channel Islands (CSUCI). Data included 1,691 students enrolled between Fall 2015 and Fall 2025. With an identifier for each student, the student's terms were also included. Winter, Spring, Summer, and Fall terms were included.
+
+The following includes an explanation of our static variables, meaning they do not change across the student's terms:
+
+```         
+  Student: Numerical student identifier
+  Term_Code: numeric identifier for term
+  Term_Desc: word description of the term that corresponds to Term_Code
+  First_CI_Term: numeric identifier for the term that students started at CI
+  First_CI_Term_Code: word description of First_CI_Term
+  First_CS_Term: numeric identifier for the term that students started 
+  First_CS_Term_Code: word description of First_CS_Term
+  Is_Hispanic: binary, 1 for yes, 0 for no
+  Gender: categorical, values include Man, Woman, and Non-Binary
+  major1, major2, major3: major(s) that students had declared during the term in question
+  Is_Transfer: binary, 1 for yes, 0 for no
+```
+
+These variables are time series dependent, meaning they are values that are dynamic across each student's terms
+
+```         
+  Unit_Load: numeric, number of units attempted
+  Lived_On_Campus: binary, 1 for yes, 0 for no
+  Num_Tutoring_Visits: integer, count of visits to LRC, WMC, and STEM Center
+  Did_Graduate: binary, 1 for yes, 0 for no
+```
+
+## Cleaning the Data
+
+-   Includes information and code about how the data was cleaned
+
+## Pivoting the Data
+
+-   includes information about how the code was pivoted
+
+-   Will include information about why this allows us to conduct analyses
+
+-   Now, we will examine the results
 
 # Results
+
 ## Descriptive Statistics
 
-## T-Tests
-## 
+### Gender
+
+Computer science programs have historically under-represented women and non-binary populations. This same relationship can be seen from the data from Channel Islands. Due to the small sample size of non-binary (*n* = 1), their value was re-coded as being female for future analyses.
+
+```{r}
+#| echo: false
+#| warning: false
+  ggplot(data = ddata,
+        mapping = aes(x = fct_infreq(Gender), fill = Gender)) + 
+        geom_bar() +
+        scale_fill_manual(values= c("#E798A1","#A90806","#A90806","#E798A1"), guide="none") +
+        labs(x = "Gender",
+             y = "Number of Students") + 
+        geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5)
+```
+
+```{r}
+#| message: false
+#| warning: false
+mdata <- ddata[ddata$Gender_Binary == 0, ]
+fdata <- ddata[ddata$Gender_Binary == 1, ]
+```
+
+It was found that both males and females stay at Channel Islands roughly the same amount of terms with males staying 5.11 terms and females staying 5.59 terms on average. A t-test determined a non-significant difference between the two groups (*p* \> .05).
+
+```{r}
+#| message: false
+#| eval: false
+#| warning: false
+mean(mdata$Terms_Attended) # Male Terms Mean
+mean(fdata$Terms_Attended) # Female Terms Mean
+t.test(mdata$Terms_Attended, fdata$Terms_Attended, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
+```
+
+Graduation rates were found to be non-significantly different (*p* \> .05), with males graduating 44.76% of the time and females 42.24% of the time across all terms.
+
+```{r}
+#| echo: true
+mean(mdata$Did_Graduate_All) # Male Graduation Mean
+mean(fdata$Did_Graduate_All) # Female Graduation Mean
+t.test(mdata$Did_Graduate_All, fdata$Did_Graduate_All, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
+```
+
+### Hispanic Status
+
+Due to Channel Islands being a Hispanic Serving Institution (HSI), exploration of student's Hispanic Status was important to us. The following chart showcases the makeup of Hispanic and Non-Hispanic student's in the Computer Science Department.
+
+```{r}
+#| echo: false
+#| warning: false
+# Hispanic Plot
+  dfhis <- as.factor(ddata$Is_Hispanic) # Converts to readable format for ggplot
+  dfhis <- as.data.frame(dfhis)
+  ggplot(data = dfhis,
+        mapping = aes(x = dfhis, fill = dfhis)) + 
+        geom_bar() +
+        labs(x = "Hispanic Staus",
+             y = "Number of Students") +
+        scale_fill_manual(values= c("#A90806","#E798A1"), guide="none") +
+        geom_text(stat = 'count', aes(label = after_stat(count)), vjust = -0.5) +
+        scale_x_discrete(labels=c("Non-Hispanic", "Hispanic"))
+```
+
+```{r}
+#| message: false
+#| warning: false
+nhisdata <- ddata[ddata$Is_Hispanic == 0, ]
+hisdata <- ddata[ddata$Is_Hispanic == 1, ]
+```
+
+Student's from both identity statuses attended same amount of terms (*Winter, Fall, Spring, Summer*) with non-Hispanic students attending a mean of 5.638 terms and Hispanic students 5.370. A two sided t-test determined no significant difference between the two groups (*p* \> .05).
+
+```{r}
+#| eval: false
+mean(nhisdata$Terms_Attended) # Non-Hispanic Terms Mean
+mean(hisdata$Terms_Attended) # Hispanic Terms Mean
+t.test(hisdata$Terms_Attended, nhisdata$Terms_Attended, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
+```
+
+Hispanic student's were found to graduate 37.5% of the time, whereas their Non-Hispanic counterparts graduated 49.3% of the time. Further examination revealed a significant difference in graduation rate among the two groups, *t*(1449)= 4.73, *p* \< .001.
+
+```{r}
+#| eval: false    
+summary(nhisdata$Did_Graduate_All) # Non-Hispanic Graduation Mean
+summary(hisdata$Did_Graduate_All) # Hispanic Graduation Mean
+t.test(nhisdata$Did_Graduate_All, hisdata$Did_Graduate_All, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
+```
+
+The intersection of the aforementioned findings indicate that Hispanic and Non-Hispanic students attend the same amount of terms, but Hispanic students graduate at a significantly lower rate.
+
+### Transfer Status
+
+Channel Islands receives lots of transfer student's due to programs in place at the local community colleges and the institutions relatively low cost. This is supported by the data we received below.
+
+```{r}
+#| echo: false
+#| warning: false
+# Transfer Plot
+  dftrans <- as.factor(ddata$Is_Transfer) # Converts to readable format for ggplot
+  dftrans <- as.data.frame(dftrans)
+  ggplot(data = dftrans,
+        mapping = aes(x = fct_infreq(dftrans), fill = dftrans, group = dftrans)) +
+        geom_bar() +
+        labs(x = "Transfer Status",
+             y = "Number of Students") +
+        scale_fill_manual(values= c("#E798A1","#A90806"), guide="none") +
+        scale_x_discrete(labels=c("Non-Transfer","Transfer")) +
+        geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5)
+```
+
+```{r}
+#| message: false
+#| warning: false
+hdata <- ddata[ddata$Is_Transfer == 0, ]
+tdata <- ddata[ddata$Is_Transfer == 1, ]
+```
+
+It was found that student's who started their academic journey at Channel Islands attend more terms (*M* = 5.96) as those who transfer (*M* = 5.15) with a significant difference, *t*(1282) = 4.957, *p* \< .001. Interestingly, this difference was not as large as expected as those who transfer should theoretically need far less classes then those who start at the institution.
+
+```{r}
+#| message: false
+#| warning: false
+#| eval: false
+summary(hdata$Terms_Attended) # Home Terms Mean
+summary(tdata$Terms_Attended) # Transfer Terms Mean
+t.test(tdata$Terms_Attended, hdata$Terms_Attended, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
+```
+
+When taking into account graduation rates, the lack of disparity between terms attended for transfer and non-transfer student becomes apparent. Student's who started at Channel Islands graduate 35.61% of the time whereas those who transfer graduate 51.98% of the time. A t-test determined that this was a significant difference, *t*(1552) = 6.61, *p* \> .001.
+
+```{r}
+#| eval: false
+#| message: false
+#| warning: false
+summary(hdata$Did_Graduate_All) # Home Graduation Mean
+summary(tdata$Did_Graduate_All) # Transfer Graduation Mean
+t.test(tdata$Did_Graduate_All, hdata$Did_Graduate_All, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
+```
+
+### Majors
+
+The Computer Science Department at Channel Islands includes the majors of Computer Science, Mechatronics and Information Technology. Due to some student's double majoring or changing programs the data includes majors that are outside this category.
+
+Our major count was:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+dfmajor <- as.data.frame(c(ddata$major1_Descr, ddata$major2_Descr, ddata$major3_Descr)) # Combines student's majors into a DF
+dfmajor <- dfmajor %>% # Removes NA Values
+            na.omit(mutate(dfmajor = str_trim(c(ddata$major1, ddata$major2, ddata$major3))))
+colnames(dfmajor) <- c("Major") # Renames Column
+dfmajor <- dfmajor %>% # Creates count of majors
+            count(Major)
+print(dfmajor)
+dfmajor <- dfmajor[dfmajor$n > 20, ] # Removes major with under 20 students
+```
+
+Due to the small sample size, majors with under 20 student's were excluded for the following chart:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+ggplot(data = dfmajor,
+        mapping = aes(x = Major, y = n, fill = Major, group = Major)) + 
+        geom_bar(stat="identity") + 
+        scale_fill_manual(values= c("#A90806","#E798A1", "#A90806","#E798A1"), guide="none") +
+        geom_text(stat = "Identity", aes(label = n), vjust = -0.5) + 
+        labs(y = "Number of Students")
+```
+
+### Gender and Hispanic Status
+
+It was found that Hispanic males graduate **39.44%** of the time, whereas their Non-Hispanic male counterparts graduate **48.54%** of the time. Similarly, Hispanic females graduate **29.13%** of the time and Non-Hispanic females graduate **53.33%** of the time. This showcases a large disparity between Hispanic and Non-Hispanic students. In addition, there is a **\~10%** difference in graduation rates among Hispanic males and females, whereas this disparity is not seen in their Non-Hispanic counterparts.
+
+```{r}
+#| eval: false
+#| message: false
+#| warning: false
+  mhisdata <- mdata[mdata$Is_Hispanic == 1, ] # Male Hispanic 
+  fhisdata <- fdata[fdata$Is_Hispanic == 1, ] # Female Hispanic
+  
+  mnhisdata <- mdata[mdata$Is_Hispanic == 0, ] # Male Not Hispanic
+  fnhisdata <- fdata[fdata$Is_Hispanic == 0, ] # Female Not Hispanic
+  
+  # Gender by Hispanic Status
+    summary(mhisdata$Did_Graduate_All) # Male Hispanic 0.3944
+    summary(fhisdata$Did_Graduate_All) # Female Hispanic 0.2913
+    
+    summary(mnhisdata$Did_Graduate_All) # Male Not Hispanic: 0.4854
+    summary(fnhisdata$Did_Graduate_All) # Female Not Hispanic: 0.5333
+```
 
 ## Logistic Regression
+
 ### Predicting Graduation Rates
+
+-   First, we need to examine what assumptions blah blah (charts and graphs to show linearity etc.)
+
+-   Will include information from the logistic regression aka results
+
+-   Will include interpretation of the results
+
+-   Will include any charts regarding what it looks like (i.e. line of best fit and assumptions)
 
 ### Background of Logistic Regression
 
-### 
+-   Will include information about how logistic regression works
+
+    -   Includes formulas and steps on how it is computed
 
 # Discussion
-
