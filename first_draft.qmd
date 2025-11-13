@@ -1,0 +1,24 @@
+---
+title: "An analysis of undergraduate major attrition rates within the department of computer science at CSUCI"
+subtitle: "MATH 398 (Fall 2025)"
+author: "Monique Calatayud, Robert McEachron, and Morgan McMurray"
+format: 
+  pdf:
+    documentclass: scrreprt
+    papersize: letter
+    df-print: paged
+    toc: true
+    toc-depth: 2
+    colorlinks: true
+execute:
+  warning: false
+  message: false
+---
+
+# Introduction
+
+# Methods
+
+# Results
+
+# Discussion
