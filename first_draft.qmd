@@ -17,8 +17,71 @@ execute:
 
 # Introduction
 
+Despite ongoing efforts to increase diversity in the technology sector, computer science programs continue to be disproportionately represented by white males. Limited minority representation within the profession contributes to the exclusion of diverse perspectives in product design, which can result in algorithmic harm—technology-driven threats to civil rights and democratic values. Understanding the factors contributing to underrepresentation in computer science is therefore critical to fostering equitable and inclusive technological development. To the best of our knowledge, no such analysis has been conducted on students currently attending California State University Channel Islands (CSUCI). This is especially important considering CSUCI is a a Hispanic-Serving Institution.
+
+Thus, the current study will examine demographics among student's enrolled in the Computer Science Program at CSUCI, while painting a holistic picture of the department. Additionally, factors predicting graduation rates among students in the program will expose problem areas necessary for intervention. The findings aim to help CSUCI and similar institutions design targeted interventions to support at-risk computer science students, ultimately contributing to a more diverse and inclusive technology workforce that better serves society as a whole.
+
+
 # Methods
+## Dataset
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+library(tidyverse)
+library(plotly)
+ddata <- read.csv("DeDuped_Data.csv")
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+# Removes NA Values and sums rows for each student if over 1
+BinaryChecker <- function(x) { 
+              x[is.na(x)] <- 0
+              as.integer(rowSums(x) > 0)
+}
+# Removes NA Values and sums rows for each student
+SummaryChecker <- function(x) { 
+              x[is.na(x)] <- 0
+              as.integer(rowSums(x))
+}
+# Recodes Gender to binary 
+  ddata$Gender <- as.character(ddata$Gender)
+  ddata$Gender_Binary <- recode(ddata$Gender,
+                                "Man" = "0",
+                                "Woman" = "1",
+                                .default = "1"
+  )
+  
+#Runs Binary/Summary Checker
+ddata$Did_Graduate_All <- BinaryChecker(ddata[, grep("_Graduate$", names(ddata))])
+ddata$Units_All <- SummaryChecker(ddata[, grep("_Unit_Load$", names(ddata))])
+ddata$Housing_All <- BinaryChecker(ddata[, grep("_Lived_On_Campus$", names(ddata))])
+ddata$Tutoring_All <- SummaryChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
+
+# Adds & Calculates Terms Attended
+ddata <- ddata %>% 
+        rowwise() %>% 
+        mutate(Terms_Attended = sum(!is.na(c_across(ends_with("_Unit_Load"))))) %>%
+        ungroup()
+```
+The data set given by the Office of Institutional Research included students enrolled in the Department of Computer Science at California State University Channel Islands (CSUCI). Data included 1,691 students enrolled between Fall 2015 and Fall 2025. 
 
 # Results
+## Descriptive Statistics
+
+## T-Tests
+## 
+
+## Logistic Regression
+### Predicting Graduation Rates
+
+### Background of Logistic Regression
+
+### 
 
 # Discussion
+
