@@ -13,6 +13,7 @@ format:
 execute:
   warning: false
   message: false
+  include: false
 ---
 
 # Introduction
@@ -26,18 +27,12 @@ Thus, the current study will examine demographics among student's enrolled in th
 ## Dataset
 
 ```{r}
-#| message: false
-#| warning: false
-#| include: false
 library(tidyverse)
 library(plotly)
 ddata <- read.csv("DeDuped_Data.csv")
 ```
 
 ```{r}
-#| message: false
-#| warning: false
-#| include: false
 # Removes NA Values and sums rows for each student if over 1
 BinaryChecker <- function(x) { 
               x[is.na(x)] <- 0
