@@ -3,13 +3,14 @@ title: "An analysis of undergraduate major attrition rates within the department
 subtitle: "MATH 398 (Fall 2025)"
 author: "Monique Calatayud, Robert McEachron, and Morgan McMurray"
 format: 
-  pdf:
-    documentclass: scrreprt
-    papersize: letter
+  html:
     df-print: paged
     toc: true
-    toc-depth: 2
-    colorlinks: true
+    toc-expand: 2
+    toc-location: left
+execute:
+  warning: false
+  message: false
 ---
 
 # Introduction
@@ -23,16 +24,12 @@ Thus, the current study will examine demographics among student's enrolled in th
 ## Data Set
 
 ```{r}
-#| message: false
-#| warning: false
 library(tidyverse)
 library(plotly)
 ddata <- read.csv("DeDuped_Data.csv")
 ```
 
 ```{r}
-#| message: false
-#| warning: false
 # Removes NA Values and sums rows for each student if over 1
 BinaryChecker <- function(x) { 
               x[is.na(x)] <- 0
@@ -117,7 +114,6 @@ Computer science programs have historically under-represented women and non-bina
 
 ```{r}
 #| echo: false
-#| warning: false
   ggplot(data = ddata,
         mapping = aes(x = fct_infreq(Gender), fill = Gender)) + 
         geom_bar() +
@@ -128,8 +124,6 @@ Computer science programs have historically under-represented women and non-bina
 ```
 
 ```{r}
-#| message: false
-#| warning: false
 mdata <- ddata[ddata$Gender_Binary == 0, ]
 fdata <- ddata[ddata$Gender_Binary == 1, ]
 ```
@@ -160,7 +154,6 @@ Due to Channel Islands being a Hispanic Serving Institution (HSI), exploration o
 
 ```{r}
 #| echo: false
-#| warning: false
 # Hispanic Plot
   dfhis <- as.factor(ddata$Is_Hispanic) # Converts to readable format for ggplot
   dfhis <- as.data.frame(dfhis)
@@ -175,8 +168,6 @@ Due to Channel Islands being a Hispanic Serving Institution (HSI), exploration o
 ```
 
 ```{r}
-#| message: false
-#| warning: false
 nhisdata <- ddata[ddata$Is_Hispanic == 0, ]
 hisdata <- ddata[ddata$Is_Hispanic == 1, ]
 ```
@@ -207,7 +198,6 @@ Channel Islands receives lots of transfer student's due to programs in place at 
 
 ```{r}
 #| echo: false
-#| warning: false
 # Transfer Plot
   dftrans <- as.factor(ddata$Is_Transfer) # Converts to readable format for ggplot
   dftrans <- as.data.frame(dftrans)
@@ -222,8 +212,6 @@ Channel Islands receives lots of transfer student's due to programs in place at 
 ```
 
 ```{r}
-#| message: false
-#| warning: false
 hdata <- ddata[ddata$Is_Transfer == 0, ]
 tdata <- ddata[ddata$Is_Transfer == 1, ]
 ```
@@ -231,8 +219,6 @@ tdata <- ddata[ddata$Is_Transfer == 1, ]
 It was found that student's who started their academic journey at Channel Islands attend more terms (*M* = 5.96) as those who transfer (*M* = 5.15) with a significant difference, *t*(1282) = 4.957, *p* \< .001. Interestingly, this difference was not as large as expected as those who transfer should theoretically need far less classes then those who start at the institution.
 
 ```{r}
-#| message: false
-#| warning: false
 #| eval: false
 summary(hdata$Terms_Attended) # Home Terms Mean
 summary(tdata$Terms_Attended) # Transfer Terms Mean
@@ -243,8 +229,6 @@ When taking into account graduation rates, the lack of disparity between terms a
 
 ```{r}
 #| eval: false
-#| message: false
-#| warning: false
 summary(hdata$Did_Graduate_All) # Home Graduation Mean
 summary(tdata$Did_Graduate_All) # Transfer Graduation Mean
 t.test(tdata$Did_Graduate_All, hdata$Did_Graduate_All, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
@@ -258,8 +242,6 @@ Our major count was:
 
 ```{r}
 #| echo: false
-#| message: false
-#| warning: false
 dfmajor <- as.data.frame(c(ddata$major1_Descr, ddata$major2_Descr, ddata$major3_Descr)) # Combines student's majors into a DF
 dfmajor <- dfmajor %>% # Removes NA Values
             na.omit(mutate(dfmajor = str_trim(c(ddata$major1, ddata$major2, ddata$major3))))
@@ -274,8 +256,6 @@ Due to the small sample size, majors with under 20 student's were excluded for t
 
 ```{r}
 #| echo: false
-#| message: false
-#| warning: false
 ggplot(data = dfmajor,
         mapping = aes(x = Major, y = n, fill = Major, group = Major)) + 
         geom_bar(stat="identity") + 
@@ -290,8 +270,6 @@ It was found that Hispanic males graduate **39.44%** of the time, whereas their 
 
 ```{r}
 #| eval: false
-#| message: false
-#| warning: false
   mhisdata <- mdata[mdata$Is_Hispanic == 1, ] # Male Hispanic 
   fhisdata <- fdata[fdata$Is_Hispanic == 1, ] # Female Hispanic
   
