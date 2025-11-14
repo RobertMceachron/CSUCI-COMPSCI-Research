@@ -4,7 +4,6 @@ setwd("~/COMPSCI_Research")
 ddata <- read.csv("DeDuped_Data.csv")
 
 
-
 ####################
 #   Demographics   #
 ####################
@@ -65,13 +64,10 @@ ddata <- read.csv("DeDuped_Data.csv")
 
 
 # Major List
-  dfmajor <- as.data.frame(c(ddata$major1, ddata$major2, ddata$major3)) # Combines student's majors into a DF
-  dfmajor <- dfmajor %>% # Removes NA Values
-            na.omit(mutate(dfmajor = str_trim(c(ddata$major1, ddata$major2, ddata$major3))))
-  colnames(dfmajor) <- c("Major") # Renames Column
+  dfmajor <- as.data.frame(ddata$major1_Descr) # Combines student's majors into a DF
+  colnames(dfmajor) <- as.character("Major") # Renames Column
   dfmajor <- dfmajor %>% # Creates count of majors
             count(Major)
-  dfmajor <- dfmajor[dfmajor$n > 20, ] # Removes any with count under 20 student's because they are non important
   ggplot(data = dfmajor,
         mapping = aes(x = Major, y = n, fill = Major, group = Major)) + 
         geom_bar(stat="identity") + 
@@ -109,20 +105,33 @@ ddata <- read.csv("DeDuped_Data.csv")
                                 .default = "1"
   )
   
+  unique(ddata$Did_Graduate)
+  ddata$Did_Graduate <- recode(ddata$Did_Graduate,
+                                "No" = "0",
+                                "Yes, with another major" = "0",
+                                "Yes, with CS/IT/EMEC" = "1",
+  )
+  ddata$Did_Graduate <- as.integer(ddata$Did_Graduate)
+  
+  
   #Runs Binary/Summary Checker 
-  ddata$Did_Graduate_All <- BinaryChecker(ddata[, grep("_Graduate$", names(ddata))])
+  ddata$Did_Graduate <- BinaryChecker(ddata[, grep("_Graduate$", names(ddata))])
   ddata$Units_All <- SummaryChecker(ddata[, grep("_Unit_Load$", names(ddata))])
   ddata$Housing_All <- BinaryChecker(ddata[, grep("_Lived_On_Campus$", names(ddata))])
   ddata$Tutoring_All <- SummaryChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
   
-  lr1 <- glm(Did_Graduate_All ~ Is_Hispanic + Gender_Binary + Is_Transfer + Terms_Attended + Housing_All + Tutoring_All,
+  
+  
+  
+  
+  lr1 <- glm(Did_Graduate ~ Is_Hispanic + Gender_Binary + Is_Transfer + Housing_All + Tutoring_All,
              data = ddata,
              family = binomial())
   
   summary(lr1)
 
 
-
+  Terms_Attended
 
 
 
