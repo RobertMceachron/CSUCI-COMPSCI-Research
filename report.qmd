@@ -106,7 +106,7 @@ The following variables are time series dependent, meaning the values are dynami
   Is_Transfer: binary, 1 for yes, 0 for no       
   Unit_Load: numeric, number of units attempted
   Lived_On_Campus: binary, 1 for yes, 0 for no
-  Num_Tutoring_Visits: integer, count of visits to LRC, WMC, and STEM Center
+  Num_Tutoring_Visits: integer, count of visits to LRC, WMC, and STEM Center combined
 ```
 
 ### Data Cleaning
@@ -115,16 +115,19 @@ The following process was conducted to focus on non-current undergraduate studen
 
 To simplify the data, term description and the major1-3 columns were removed. The major description columns were renamed to include underscores for R accessibility.
 
-Duplicate rows were removed by retaining the last term row per student (*n* = ). Students whose last term row did not match their graduation code were removed (*n* = ), as time series variables were not included in their graduation term. Additionally, current students (n = 2,053), students who declared two or more majors at any term (*n* = ), and those who were in a Master's program were removed (*n* =). After these exclusions, N = term rows and N = students remained.
+Multiple remaining rows per student had the same term code but different dependent codes.  The last unique term row per student was maintained; the rest were removed (*n* = 2150 rows). Students whose last term row did not match their graduation term code were also removed (*n* = 277 rows), as time series variables were not included in their graduation term. Additionally, current students (*n* = 2,053 rows), students who declared two or more majors at any term (*n* = 573 rows), and those who were in a Master's program (*n* = 12 rows) were removed. After these exclusions, N = 6342 term rows and N = 1091 students remained.
 
-The Did_Graduate column was re-coded to represent students who: Did not graduate (0), graduated with one of the majors within the computer science program (), or graduated with another major (). Finally, rows corresponding to terms outside of a student's enrollment in computer science program were excluded (n = ), leaving the final dataset for
-pivoting (N = ).
+The Did_Graduate column was re-coded to represent students who: Did not graduate (0), graduated with one of the majors within the computer science program (1), or graduated with another major (0). Finally, rows corresponding to terms outside of a student's enrollment in computer science program were excluded (*n* = 640 rows), leaving the final dataset for pivoting (N = 5702 rows).
 
 ### Data Transformation
 
-The dataset was pivoted to to represent one row per student to ensure compatibility with statistical methods and reduce redundancy.
+The dataset was pivoted to represent one row per student in order to ensure compatibility with statistical methods and reduce redundancy.
 
--   Includes information about how the code was pivoted
+The pivoting algorithm works as follows:
+
+    1. Static variable names were gathered into a vector.
+    2. The final pivoted dataset was initialized with all static variables from the first row of the fully cleaned dataset.
+    3. Pivoting variables []
 
 -   Will include information about why this allows us to conduct
     analyses
