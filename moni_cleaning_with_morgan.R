@@ -117,7 +117,7 @@ for (current_row in 1:nrow(cleaned_and_reordered)) {
   # P O P U L A T I O N  T I M E
   # P O P U L A T I O N  T I M E
   
-  # For the first 5 new columns
+  # For the first 4 new columns
   # That is: "T_n_Term_Code", "T_n_Unit_Load", "T_n_Lived_On_Campus",
   # and "T_n_Num_Tutoring_Visits"
   for (ts_col in 1:4) {

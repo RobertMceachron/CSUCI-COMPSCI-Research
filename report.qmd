@@ -424,11 +424,14 @@ Graduation rates were found to be non-significantly different (*p* \>
 .05), with males graduating 44.76% of the time and females 42.24% of the
 time across all terms.
 
+There is a significant association between gender and the likelihood of graduating (*p* <\
+.01), with fewer females graduating (n = 339) compared to males, and more females did not graduate compared to males (n = 1577).
+
 ```{r}
 #| echo: true
-mean(mdata$Did_Graduate) # Male Graduation Mean
-mean(fdata$Did_Graduate) # Female Graduation Mean
 t.test(mdata$Did_Graduate, fdata$Did_Graduate, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
+chi_gender_grad <- table(ddata$Gender_Binary, ddata$Did_Graduate)
+chi_gender_grad_result <- chisq.test(chi_gender_grad)
 ```
 
 ### Hispanic Status
