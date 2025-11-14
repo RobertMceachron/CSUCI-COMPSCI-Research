@@ -17,13 +17,33 @@ editor:
 ---
 
 # Introduction
-Despite ongoing efforts to increase diversity in the technology sector, computer science programs continue to be disproportionately represented by white males. Limited minority representation within the profession contributes to the exclusion of diverse perspectives in product design, which can result in algorithmic harm—technology-driven threats to civil rights and democratic values. Understanding the factors contributing to underrepresentation in computer science is therefore critical to fostering equitable and inclusive technological development. To the best of our knowledge, no such analysis has been conducted on students currently attending California State University Channel Islands (CSUCI). Given that CSUCI is a Hispanic-Serving Institution.
 
-Thus, the current study will examine demographics among student's enrolled in the Computer Science Program at CSUCI, while painting a holistic picture of the department. Additionally, factors predicting graduation rates among students in the program will expose problem areas necessary for intervention. The findings aim to help CSUCI and similar institutions design targeted interventions to support at-risk computer science students, ultimately contributing to a more diverse and inclusive technology workforce that better serves society as a whole.
+Despite ongoing efforts to increase diversity in the technology sector,
+computer science programs continue to be disproportionately represented
+by white males. Limited minority representation within the profession
+contributes to the exclusion of diverse perspectives in product design,
+which can result in algorithmic harm—technology-driven threats to civil
+rights and democratic values. Understanding the factors contributing to
+underrepresentation in computer science is therefore critical to
+fostering equitable and inclusive technological development. To the best
+of our knowledge, no such analysis has been conducted on students
+currently attending California State University Channel Islands (CSUCI).
+Given that CSUCI is a Hispanic-Serving Institution.
+
+Thus, the current study will examine demographics among student's
+enrolled in the Computer Science Program at CSUCI, while painting a
+holistic picture of the department. Additionally, factors predicting
+graduation rates among students in the program will expose problem areas
+necessary for intervention. The findings aim to help CSUCI and similar
+institutions design targeted interventions to support at-risk computer
+science students, ultimately contributing to a more diverse and
+inclusive technology workforce that better serves society as a whole.
 
 # Method
+
 ## Data
-All code was analyzed using R version 4.5.2. 
+
+All code was analyzed using R version 4.5.2.
 
 ### Data Description
 
@@ -79,10 +99,15 @@ ddata <- ddata %>%
         ungroup()
 ```
 
-The data was obtained from the Office of Institutional Research (IR) and included 1,091 students enrolled in the Department of Computer Science at California State University Channel Islands (CSUCI) between Fall 2015 and Fall 2025. Fall, Winter, Spring, and Summer terms were included. There was a total of 11,407 rows, each representing one term for a
+The data was obtained from the Office of Institutional Research (IR) and
+included 1,091 students enrolled in the Department of Computer Science
+at California State University Channel Islands (CSUCI) between Fall 2015
+and Fall 2025. Fall, Winter, Spring, and Summer terms were included.
+There was a total of 11,407 rows, each representing one term for a
 student.
 
-The following includes an explanation of our static variables, meaning they do not change across the student's terms:
+The following includes an explanation of our static variables, meaning
+they do not change across the student's terms:
 
 ```         
   Student: Numerical annoymized student identifier
@@ -95,7 +120,8 @@ The following includes an explanation of our static variables, meaning they do n
   Did_Graduate: binary, 1 for yes, 0 for no
 ```
 
-The following variables are time series dependent, meaning the values are dynamic across each student's terms:
+The following variables are time series dependent, meaning the values
+are dynamic across each student's terms:
 
 ```         
   Time Series Dependent (values change across each student's term)
@@ -106,7 +132,7 @@ The following variables are time series dependent, meaning the values are dynami
   Is_Transfer: binary, 1 for yes, 0 for no       
   Unit_Load: numeric, number of units attempted
   Lived_On_Campus: binary, 1 for yes, 0 for no
-  Num_Tutoring_Visits: integer, count of visits to LRC, WMC, and STEM Center combined
+  Num_Tutoring_Visits: integer, count of visits to LRC, WMC, and STEM Center
 ```
 
 ### Data Cleaning
@@ -136,13 +162,20 @@ Include the binary input and adding more columns Due to the small sample size of
 
 ## Descriptive Statistics
 
-Descriptive analyses were conducted to summarize the characteristics of the sample. For continuous variables
+Descriptive analyses were conducted to summarize the characteristics of
+those in the sample. Our sample included a total of 1,091 students, with
+84.4% males (*n* = 921) and 15.6% females (*n* = 169). Additionally,
+60.9% of our sample identified as being Non-Hispanic (*n* = 664) and
+39.1% identified as being Hispanic (*n* = 427). About half of the
+students did not transfer (54.1%; *n* = 590), with the other half
+transferring (45.9%; *n* = 501).
 
-Total students, and per group. The final sample included Gender, Hispanic,Transfer,Majors,
-
-Continuous variables(mean, SD, range?)
-
-Categorical variables (counts/percentages)
+In regards to students' class taking habits, the average units taken per
+term was 11.42 while students stayed an average of 5.23 terms (*SD* =
+3.11). Within the department, 73.9% majored in Computer Science, 16.7%
+majored in Information Technology, and the remaining 4% majored in
+Mechatronics Engineering. Now that we have a better understanding of our
+sample, we will explain the background of our statistical analyses.
 
 # Statistical Analyses
 
@@ -152,10 +185,14 @@ Categorical variables (counts/percentages)
 
 A binary logistic regression was used to predict graduation.
 
-A binary logistic regression is a multivariate prediction method that allows for categorical and continuous variables to predict a binary outcome. The logistic function, the sigmoid curve, models the relationship between the predictor variables the probability of the
+A binary logistic regression is a multivariate prediction method that
+allows for categorical and continuous variables to predict a binary
+outcome. The logistic function, the sigmoid curve, models the
+relationship between the predictor variables the probability of the
 outcome.
 
-Odd ratio compares the probability of the event -Include the math, which variables used, assumptions, etc
+Odd ratio compares the probability of the event -Include the math, which
+variables used, assumptions, etc
 
 # Results
 
@@ -163,7 +200,10 @@ Odd ratio compares the probability of the event -Include the math, which variabl
 
 ### Gender
 
-Computer science programs have historically under-represented women and non-binary populations. This same relationship can be seen from the data from Channel Islands. Due to the small sample size of non-binary (*n* = 1), their value was re-coded as being female for future analyses.
+Computer science programs have historically under-represented women and
+non-binary populations. This same relationship can be seen from the data
+from Channel Islands. Due to the small sample size of non-binary (*n* =
+1), their value was re-coded as being female for future analyses.
 
 ```{r}
 #| echo: false
@@ -184,7 +224,10 @@ mdata <- ddata[ddata$Gender_Binary == 0, ]
 fdata <- ddata[ddata$Gender_Binary == 1, ]
 ```
 
-It was found that both males and females stay at Channel Islands roughly the same amount of terms with males staying 5.11 terms and females staying 5.59 terms on average. A t-test determined a non-significant difference between the two groups (*p* \> .05).
+It was found that both males and females stay at Channel Islands roughly
+the same amount of terms with males staying 5.11 terms and females
+staying 5.59 terms on average. A t-test determined a non-significant
+difference between the two groups (*p* \> .05).
 
 ```{r}
 #| message: false
@@ -195,7 +238,9 @@ mean(fdata$Terms_Attended) # Female Terms Mean
 t.test(mdata$Terms_Attended, fdata$Terms_Attended, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
 ```
 
-Graduation rates were found to be non-significantly different (*p* \> .05), with males graduating 44.76% of the time and females 42.24% of the time across all terms.
+Graduation rates were found to be non-significantly different (*p* \>
+.05), with males graduating 44.76% of the time and females 42.24% of the
+time across all terms.
 
 ```{r}
 #| echo: true
