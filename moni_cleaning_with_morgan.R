@@ -63,6 +63,123 @@ only_cs_rows <- recoded_graduation %>% group_by(major1_Descr) %>% filter(major1_
 cleaned_and_reordered <- only_cs_rows %>% select(Student, Is_Hispanic, Gender, 
                                                      Is_Transfer, Dependent_Income_Code, 
                                                      First_CI_Term, First_CS_Term, major1_Descr, 
-                                                     major2_Descr, major3_Descr, Term_Code, 
-                                                     Unit_Load, Lived_On_Campus, Num_Tutoring_Visits, 
-                                                     Did_Graduate)
+                                                     major2_Descr, major3_Descr, Did_Graduate, Term_Code, 
+                                                     Unit_Load, Lived_On_Campus, Num_Tutoring_Visits)
+
+# P I V O T  T I M E
+# P I V O T  T I M E
+# P I V O T  T I M E
+
+# Get first row of all static data columns
+static_data <- c("Student", "Is_Hispanic", "Gender", "Is_Transfer", 
+                 "Dependent_Income_Code", "First_CI_Term", "First_CS_Term", 
+                 "major1_Descr", "major2_Descr", "major3_Descr", "Did_Graduate")
+
+pivoted <- cleaned_and_reordered[1, static_data]
+
+# Get relevant pivoting variables from the first student
+# Such that the pivoting loop can be initialized
+current_id <- cleaned_and_reordered[1, "Student"]
+current_major1 <- cleaned_and_reordered[1, "major1_Descr"]
+current_major2 <- cleaned_and_reordered[1, "major2_Descr"]
+current_major3 <- cleaned_and_reordered[1, "major3_Descr"]
+current_term <- 1
+current_entry <- 1
+
+# The loop that pivots the data
+for (current_row in 1:nrow(cleaned_and_reordered)) {
+  
+  # If the current student number is different from the saved student number,
+  # Save new student number and their majors, reset term number,
+  # and add new row with static data
+  if (cleaned_and_reordered[current_row, "Student"] != current_id) {
+    current_id <- cleaned_and_reordered[current_row, "Student"]
+    current_major1 <- cleaned_and_reordered[current_row, "major1_Descr"]
+    current_major2 <- cleaned_and_reordered[current_row, "major2_Descr"]
+    current_major3 <- cleaned_and_reordered[current_row, "major3_Descr"]
+    current_term <- 1
+    current_entry <- current_entry + 1
+    pivoted[current_entry, ] <- c(cleaned_and_reordered[current_row, static_data], rep(NA, each = (ncol(pivoted) - length(static_data))))
+  }
+  
+  # Initialize the column names for the current term
+  # These will be populated with values for the time-dependent variables
+  current_col_label <- paste("T", current_term, "_", sep = "")
+  current_cols <- c(paste(current_col_label, "Term_Code", sep=""),
+                    paste(current_col_label, "Unit_Load", sep=""),
+                    paste(current_col_label, "Lived_On_Campus", sep=""),
+                    paste(current_col_label, "Num_Tutoring_Visits", sep=""),
+                    paste(current_col_label, "major1_Descr_New", sep=""),
+                    paste(current_col_label, "major2_Descr_New", sep=""),
+                    paste(current_col_label, "major3_Descr_New", sep=""))
+  
+  # P O P U L A T I O N  T I M E
+  # P O P U L A T I O N  T I M E
+  # P O P U L A T I O N  T I M E
+  
+  # For the first 5 new columns
+  # That is: "T_n_Term_Code", "T_n_Unit_Load", "T_n_Lived_On_Campus",
+  # and "T_n_Num_Tutoring_Visits"
+  for (ts_col in 1:4) {
+    
+    # Copy and paste the corresponding data from cleaned and reordered_data
+    pivoted[current_entry, current_cols[ts_col]] <- cleaned_and_reordered[current_row, (length(static_data) + ts_col)]
+  }
+  
+  # Enter a new major in the corresponding "new major" columns
+  # if the student changed their major at the end of a term
+  # Otherwise, fill the spot with NA
+  if (current_major1 != cleaned_and_reordered[current_row, "major1_Descr"]) {
+    
+    # the number is the index of the "major1_Descr_New" string in current_cols
+    pivoted[current_entry, current_cols[5]] <- cleaned_and_reordered[current_row, "major1_Descr"]
+    current_major1 <- cleaned_and_reordered[current_row, "major1_Descr"]
+  } else {
+    pivoted[current_entry, current_cols[5]] <- NA
+  }
+  
+  if (is.na(current_major2)) {
+    
+    # the number is the index of the "major2_Descr_New" string in current_cols
+    if (!is.na(cleaned_and_reordered[current_row, "major2_Descr"])) {
+       pivoted[current_entry, current_cols[6]] <- cleaned_and_reordered[current_row, "major2_Descr"]
+       current_major2 <- cleaned_and_reordered[current_row, "major2_Descr"]
+     } else {
+       pivoted[current_entry, current_cols[6]] <- NA
+     }
+     
+  } else {
+     
+     if ((is.na(cleaned_and_reordered[current_row, "major2_Descr"])) || (current_major2 != cleaned_and_reordered[current_row, "major2_Descr"])) {
+       pivoted[current_entry, current_cols[6]] <- cleaned_and_reordered[current_row, "major2_Descr"]
+       current_major2 <- cleaned_and_reordered[current_row, "major2_Descr"]
+     } else {
+       pivoted[current_entry, current_cols[6]] <- NA
+     }
+     
+  }
+   
+  if (is.na(current_major3)) {
+   
+    # The number is the index of the "major3_Descr_New" string in current_cols
+   if (!is.na(cleaned_and_reordered[current_row, "major3_Descr"])) {
+      pivoted[current_entry, current_cols[7]] <- cleaned_and_reordered[current_row, "major3_Descr"]
+      current_major3 <- cleaned_and_reordered[current_row, "major3_Descr"]
+   } else {
+      pivoted[current_entry, current_cols[7]] <- NA
+   }
+   
+ } else {
+    
+    if ((is.na(cleaned_and_reordered[current_row, "major3_Descr"])) || (current_major3 != cleaned_and_reordered[current_row, "major3_Descr"])) {
+      pivoted[current_entry, current_cols[7]] <- cleaned_and_reordered[current_row, "major3_Descr"]
+      current_major3 <- cleaned_and_reordered[current_row, "major3_Descr"]
+    } else {
+      pivoted[current_entry, current_cols[7]] <- NA
+    }
+    
+ }
+  
+  # Move on to the next term
+  current_term <- current_term + 1
+}
