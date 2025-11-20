@@ -90,13 +90,30 @@ are dynamic across each student's terms:
 
 ### Data Cleaning
 
-The following process was conducted to focus on non-current undergraduate students who declared only one major throughout their academic trajectory.
+The following process was conducted to focus on non-current
+undergraduate students who declared only one major throughout their
+academic trajectory.
 
-To simplify the data, term description and the major1-3 columns were removed. The major description columns were renamed to include underscores for R accessibility.
+To simplify the data, term description and the major1-3 columns were
+removed. The major description columns were renamed to include
+underscores for R accessibility.
 
-Multiple remaining rows per student had the same term code but different dependent codes.  The last unique term row per student was maintained; the rest were removed (*n* = 2150 rows). Students whose last term row did not match their graduation term code were also removed (*n* = 277 rows), as time series variables were not included in their graduation term. Additionally, current students (*n* = 2,053 rows), students who declared two or more majors at any term (*n* = 573 rows), and those who were in a Master's program (*n* = 12 rows) were removed. After these exclusions, N = 6342 term rows and N = 1091 students remained.
+Multiple remaining rows per student had the same term code but different
+dependent codes. The last unique term row per student was maintained;
+the rest were removed (*n* = 2150 rows). Students whose last term row
+did not match their graduation term code were also removed (*n* = 277
+rows), as time series variables were not included in their graduation
+term. Additionally, current students (*n* = 2,053 rows), students who
+declared two or more majors at any term (*n* = 573 rows), and those who
+were in a Master's program (*n* = 12 rows) were removed. After these
+exclusions, N = 6342 term rows and N = 1091 students remained.
 
-The Did_Graduate column was re-coded to represent students who: Did not graduate (0), graduated with one of the majors within the computer science program (1), or graduated with another major (0). Finally, rows corresponding to terms outside of a student's enrollment in computer science program were excluded (*n* = 640 rows), leaving the final dataset for pivoting (N = 5702 rows).
+The Did_Graduate column was re-coded to represent students who: Did not
+graduate (0), graduated with one of the majors within the computer
+science program (1), or graduated with another major (0). Finally, rows
+corresponding to terms outside of a student's enrollment in computer
+science program were excluded (*n* = 640 rows), leaving the final
+dataset for pivoting (N = 5702 rows).
 
 ```{r}
 # Load necessary libraries
@@ -170,13 +187,24 @@ cleaned_and_reordered <- only_cs_rows %>% select(Student, Is_Hispanic, Gender,
 
 ### Data Transformation
 
-The dataset was pivoted to represent one row per student in order to ensure compatibility with statistical methods and reduce redundancy.
+The dataset was pivoted to represent one row per student in order to
+ensure compatibility with statistical methods and reduce redundancy.
 
-Because the number of terms a student was enrolled in a major from the Computer Science Program varies by student, dataset pivoting was done through a for loop that created new rows based on whether a change in the "Student" column was observed. A detailed walkthrough of the code is written below.
+Because the number of terms a student was enrolled in a major from the
+Computer Science Program varies by student, dataset pivoting was done
+through a for loop that created new rows based on whether a change in
+the "Student" column was observed. A detailed walk through of the code
+is written below.
 
-The primary statistical method in this analysis is logistical regression. Since the original data was collected as a time series, independence (one of the assumptions of logistic regression) was violated. Pivoting the original dataset such that each observation is an individual student creates independence and, in part, assures that the assumptions for logistic regression are met.
+The primary statistical method in this analysis is logistical
+regression. Since the original data was collected as a time series,
+independence (one of the assumptions of logistic regression) was
+violated. Pivoting the original dataset such that each observation is an
+individual student creates independence and, in part, assures that the
+assumptions for logistic regression are met.
 
-Due to the small sample size of non-binary (*n* = 1), their value was re-coded as being female for future analyses.
+Due to the small sample size of non-binary (*n* = 1), their value was
+re-coded as being female for future analyses.
 
 ```{r}
 # Get first row of all static data columns
@@ -227,7 +255,7 @@ for (current_row in 1:nrow(cleaned_and_reordered)) {
   # and "T_n_Num_Tutoring_Visits"
   for (ts_col in 1:4) {
     
-    # Copy and paste the corresponding data from cleaned_and_reordered_data
+    # Copy and paste the corresponding data from cleaned and reordered_data
     pivoted[current_entry, current_cols[ts_col]] <- cleaned_and_reordered[current_row, (length(static_data) + ts_col)]
   }
   
@@ -298,7 +326,7 @@ for (current_row in 1:nrow(cleaned_and_reordered)) {
 #| include: false
 library(tidyverse)
 library(plotly)
-ddata <- read.csv("DeDuped_Data.csv")
+ddata <- pivoted
 ```
 
 ```{r}
@@ -424,8 +452,10 @@ Graduation rates were found to be non-significantly different (*p* \>
 .05), with males graduating 44.76% of the time and females 42.24% of the
 time across all terms.
 
-There is a significant association between gender and the likelihood of graduating (*p* <\
-.01), with fewer females graduating (n = 339) compared to males, and more females did not graduate compared to males (n = 1577).
+There is a significant association between gender and the likelihood of
+graduating (*p* \< .01), with fewer females graduating (n = 339)
+compared to males, and more females did not graduate compared to males
+(n = 1577).
 
 ```{r}
 #| echo: true
@@ -601,7 +631,7 @@ Non-Hispanic females graduate **53.33%** of the time. This showcases a
 large disparity between Hispanic and Non-Hispanic students. In addition,
 there is a **\~10%** difference in graduation rates among Hispanic males
 and females, whereas this disparity is not seen in their Non-Hispanic
-counterparts.
+counterparts.s
 
 ```{r}
 #| eval: false
