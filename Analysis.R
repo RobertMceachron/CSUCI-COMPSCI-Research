@@ -1,8 +1,8 @@
 library(tidyverse)
 library(plotly)
-setwd("~/COMPSCI_Research")
 ddata <- read.csv("DeDuped_Data.csv")
 
+ddata <- pivoted
 
 ####################
 #   Demographics   #
@@ -293,9 +293,58 @@ ddata <- read.csv("DeDuped_Data.csv")
       summary(over75data$Did_Graduate_All) # 72k and above: 0.4786
       
       
+
+# Survival Analysis
+#######################  
+library(survival)
+library(survminer)
+library(ggsurvfit)   
+      pdata <- read.csv("clean_reorder.csv")
+      pdata <- pdata %>%
+        group_by(Student) %>% 
+        mutate(
+          start = seq(0, n()-1),
+          stop = seq(1, n())
+        )
+
+      pdata$Gender <- as.character(pdata$Gender)
+      pdata$Gender_Binary <- recode(pdata$Gender,
+                                    "Man" = "0",
+                                    "Woman" = "1",
+                                    .default = "1"
+      )
       
+      
+      pdata$Graduate <- ifelse(pdata$Did_Graduate == pdata$Term_Code, 1, 0)
+
+
+
+     survmodelcox <- coxph(Surv(time = start, time2 = stop, event = Graduate) ~ Unit_Load + Lived_On_Campus + Num_Tutoring_Visits + Is_Hispanic + Is_Transfer + Gender_Binary, 
+                      data = data = pdata)
+      surv_fit <- survfit(survmodelcox)
+      summary(survmodelcox)
+      ggsurvplot(surv_fit, data = pdata,
+                 xlab = "Time",
+                 ylab = "Survival Probability",
+                 title = "Survival Curves from Cox Proportional Hazards Model",
+                 conf.int = TRUE,    # Confidence intervals
+                 risk.table = TRUE,   # Show risk table
+                 palette = "Dark2")   # Color palette
   
-#############
+      
+
+# if Term code = graduate put a 1
+# Make start and stop colum that takes into account grouped by student (how many rows)
+
+      
+      
+      survival_object <- Surv(time = ddata$Terms_Attended, event = ddata$Did_Graduate) 
+      surv_model <- survfit(survival_object ~ ddata$Is_Hispanic, data = ddata)
+      ggsurvplot(surv_model, data = ddata)
+      summary(surv_model)
+      
+      
+      #############
 #   Other   #
 #############
     

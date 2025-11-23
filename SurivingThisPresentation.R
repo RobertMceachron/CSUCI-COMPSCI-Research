@@ -4,6 +4,7 @@ library(survival) # For Survival
 library(survminer) # For Suvival Plots
 library(ggsurvfit)  # For Suvival Plots
 library(timereg) # 
+library(tidyverse)
 # Others (Dont Know Which I need)
 library(lubridate)
 library(gtsummary)
@@ -14,7 +15,7 @@ ddata <- read.csv("clean_reorder.csv")
 
 
 
-##########################
+  ##########################
 # Cleaned and Reordered  #
 ##########################
   # Re-codes Values of Male/Female to Binary
@@ -34,14 +35,19 @@ ddata <- read.csv("clean_reorder.csv")
       stop = seq(1, n())
     )
 
-
+  
+  
+# IS Transfer
+ddata <- ddata[ddata$Is_Transfer == 1, ]
+  
+  
 
 ######################
 # Survival Analysis  #
 ######################
 
 # Cox Proportional Hazards Model w/All Variables 
-  CoxAll <- coxph(Surv(time = start, time2 = stop, event = Did_Graduate_Binary) ~ Lived_On_Campus + Num_Tutoring_Visits + Is_Hispanic + Is_Transfer + Gender_Binary, 
+  CoxAll <- coxph(Surv(time = start, time2 = stop, event = Did_Graduate_Binary) ~ Lived_On_Campus + Num_Tutoring_Visits + Is_Hispanic + Gender_Binary, 
                         data = ddata) 
   
   CoxAll |> 
@@ -64,9 +70,11 @@ ddata <- read.csv("clean_reorder.csv")
              title = "Survival Curves from Cox Proportional Hazards Model")
 
 # Gender Fit
-  CoxGen <- survfit(Surv(start, stop, Did_Graduate_Binary) ~ Gender_Binary, data = ddata)
+  CoxGen <- survfit(Surv(start, stop, Did_Graduate_Binary) ~ Lived_On_Campus, data = ddata)
   
   summary(CoxGen)
   ggsurvplot(CoxGen, data = ddata, conf.int = TRUE, 
              xlab = "Time", ylab = "Survival Probability",
              title = "Survival Curves (Gender)")
+
+  
