@@ -1,88 +1,114 @@
 library(tidyverse)
 library(plotly)
-ddata <- read.csv("DeDuped_Data.csv")
+sdata <- read.csv("trimmed_pivoted_df.csv")
+s1data <- sdata
 
-ddata <- pivoted
+sdata <- s1data
+
+
+#####
+dfcamp <- sdata %>% # Creates data frame with lived on campus rows
+  group_by(Student) %>% 
+  summarise(across(ends_with("Lived_On_Campus"), ~ max(.x, na.rm = TRUE), .names = "Max_{col}")) %>%
+  ungroup()
+dfcampanal <- dfcamp %>% # Creates a single column with binary variable if they lived on campus at any point
+  group_by(Student) %>%
+  summarise(Has_One = any(c_across() == 1)) %>%
+  ungroup()
+
+sdata$Tutoring_Binned <- cut(sdata$Tutoring_All,
+                    breaks = c(-1, 0, 5, 10,Inf),
+                    include.lowest = TRUE,
+                    labels = c("No Tutoring", "Low (0-5)", "Moderate (5-10)",
+                               "> 10"))
+
+sdata$Binned <- cut(sdata$AverageUnits,
+                    breaks = c(0, 11, 15, 18),
+                    include.lowest = TRUE,
+                    labels = c("Parttime (< 11)", "Fulltime (11-18)", "Heavy (> 18)"))
+
 
 ####################
 #   Demographics   #
 ####################
 
 # Gender Plot
-  ggplot(data = ddata,
-        mapping = aes(x = fct_infreq(Gender), fill = Gender)) + 
-        geom_bar() +
-        scale_fill_manual(values= c("#E798A1","#A90806","#A90806","#E798A1"), guide="none") +
-        labs(x = "Gender",
-             y = "Number of Students") + 
-        geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5)
+ggplot(sdata, mapping = aes(x = fct_infreq(Gender_Binary), fill = Gender_Binary)) + 
+      geom_bar() +
+      scale_fill_manual(values= c("#E798A1","#A90806","#A90806","#E798A1"), guide="none") +
+      labs(x = "Gender", y = "Number of Students") + 
+      geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5)
 
 # Hispanic Plot
-  dfhis <- as.factor(ddata$Is_Hispanic) # Converts to readable format for ggplot
-  dfhis <- as.data.frame(dfhis)
-  ggplot(data = dfhis,
-        mapping = aes(x = dfhis, fill = dfhis)) + 
-        geom_bar() +
-        labs(x = "Hispanic Staus",
-             y = "Number of Students") +
-        scale_fill_manual(values= c("#A90806","#E798A1"), guide="none") +
-        geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) +
-        scale_x_discrete(labels=c("Non-Hispanic", "Hispanic"))
+ggplot(sdata, mapping = aes(x = Is_Hispanic, fill = Is_Hispanic)) + 
+      geom_bar() +
+      labs(x = "Hispanic Staus", y = "Number of Students") +
+      scale_fill_manual(values= c("#A90806","#E798A1"), guide="none") +
+      scale_x_discrete(labels=c("Non-Hispanic", "Hispanic")) +
+      geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5)
 
 # Transfer Plot
-  dftrans <- as.factor(ddata$Is_Transfer) # Converts to readable format for ggplot
-  dftrans <- as.data.frame(dftrans)
-  ggplot(data = dftrans,
-        mapping = aes(x = fct_infreq(dftrans), fill = dftrans, group = dftrans)) +
-        geom_bar() +
-        labs(x = "Transfer Status",
-             y = "Number of Students") +
-        scale_fill_manual(values= c("#E798A1","#A90806"), guide="none") +
-        scale_x_discrete(labels=c("Non-Transfer","Transfer")) +
-        geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) 
+ggplot(sdata, mapping = aes(x = fct_infreq(Is_Transfer), fill = Is_Transfer, group = Is_Transfer)) +
+      geom_bar() +
+      labs(x = "Transfer Status", y = "Number of Students") +
+      scale_fill_manual(values= c("#E798A1","#A90806"), guide="none") +
+      scale_x_discrete(labels=c("Non-Transfer","Transfer")) +
+      geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) 
 
 # Lived on Campus
-  dfcamp <- ddata %>% # Creates data frame with lived on campus rows
-          group_by(Student) %>% 
-          summarise(across(ends_with("Lived_On_Campus"), ~ max(.x, na.rm = TRUE), .names = "Max_{col}")) %>%
-          ungroup()
-
-  dfcampanal <- dfcamp %>% # Creates a single column with binary variable if they lived on campus at any point
-              group_by(Student) %>%
-              summarise(Has_One = any(c_across() == 1)) %>%
-              ungroup()
+ggplot(sdata, mapping = aes(x = Housing_All, fill = Housing_All)) +
+      geom_bar() +
+      labs(x = "Lived On Campus (Throughout Education)", y = "Number of Students") +
+      scale_fill_manual(values= c("#A90806","#E798A1"), guide="none") +
+      scale_x_discrete(labels=c("Off-Campus","On-Campus")) +
+      geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) 
   
-  ggplot(data = dfcampanal,
-        mapping = aes(x = Has_One, fill = Has_One)) +
-        geom_bar() + 
-        labs(x = "Lived On Campus (Throughout Education)",
-             y = "Number of Students") +
-        scale_fill_manual(values= c("#A90806","#E798A1"), guide="none") +
-        scale_x_discrete(labels=c("Off-Campus","On-Campus")) +
-        geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) 
+# Graduation 
+ggplot(sdata, mapping = aes(x = Did_Graduate_Binary, fill = Did_Graduate_Binary)) +
+      geom_bar() +
+      scale_fill_manual(values= c("#A90806","#E798A1"), guide="none") + 
+      labs(x = "Graduation Status", y = "Number of Students") +
+      geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) 
+
+# Tutoring Binned
+ggplot(sdata, mapping = aes(x = Tutoring_Binned, fill = Tutoring_Binned)) +
+      geom_bar() +
+      labs(x = "Student Status (Based on Units)", y = "Number of Students") +
+      scale_fill_manual(values = c("#E798A1", "#A90806", "#E798A1", "#A90806"), guide = "none") +
+      geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5)   
   
+# Student Status (Units)
+ggplot(sdata, mapping = aes(x = Binned, fill = Binned)) +
+      geom_bar() +
+      scale_fill_manual(values= c("#E798A1", "#A90806", "#E798A1"), guide = "none") + 
+      labs(x = "Student Status (Based off Units)", y = "Density",) + 
+      geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5)
 
+# Units Density Plot  
+ggplot(sdata, mapping = aes(x = Units_All)) +
+      geom_density(adjust = 1L, fill = "#F6A6B0") +
+      labs(x = "Units Taken", y = "Density",
+      title = "Density of Units Taken") +
+      theme(plot.title = element_text(size = 18L, hjust = 0.5),
+            axis.title.y = element_text(size = 15L),
+            axis.title.x = element_text(size = 15L))
 
-# Major List
-  dfmajor <- as.data.frame(ddata$major1_Descr) # Combines student's majors into a DF
-  colnames(dfmajor) <- as.character("Major") # Renames Column
-  dfmajor <- dfmajor %>% # Creates count of majors
+# Major List////////////// Will need recode
+dfmajor <- as.data.frame(sdata$major1_Descr) # Combines student's majors into a DF
+colnames(dfmajor) <- as.character("Major") # Renames Column
+dfmajor <- dfmajor %>% # Creates count of majors
             count(Major)
-  ggplot(data = dfmajor,
-        mapping = aes(x = Major, y = n, fill = Major, group = Major)) + 
-        geom_bar(stat="identity") + 
-        scale_fill_manual(values= c("#A90806","#E798A1", "#A90806","#E798A1"), guide="none") +
-        geom_text(stat = "Identity", aes(label = n), vjust = -0.5) + 
-        labs(y = "Number of Students")
+ggplot(data = sdata, mapping = aes(x = Major, fill = Major)) + 
+      geom_bar(stat="identity") + 
+      scale_fill_manual(values= c("#A90806","#E798A1", "#A90806","#E798A1"), guide="none") +
+      geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) +  
+      labs(y = "Number of Students")
 
 
 ####################
-#   Data Analysis  #
+#   Data Cleaning  #
 ####################
 
-
-# Logistic Regression #1 (Graduation)
-#####################################
   # Removes NA Values and sums rows for each student if over 1
   BinaryChecker <- function(x) { 
               x[is.na(x)] <- 0
@@ -94,66 +120,65 @@ ddata <- pivoted
               as.integer(rowSums(x))
   }
   # Recodes Values of gender to ##############################################
-  GenderBinary <- ddata$Gender %>%
-              mutate(ddata, recode(GenderBin,
+  GenderBinary <- sdata$Gender %>%
+              mutate(sdata, recode(GenderBin,
                                    "Male" = 0,
                                    "Female" = 1))
-  ddata$Gender <- as.character(ddata$Gender)
-  ddata$Gender_Binary <- recode(ddata$Gender,
+  sdata$Gender <- as.character(sdata$Gender)
+  sdata$Gender_Binary <- recode(sdata$Gender,
                                 "Man" = "0",
                                 "Woman" = "1",
                                 .default = "1"
   )
   
-  unique(ddata$Did_Graduate)
-  ddata$Did_Graduate <- recode(ddata$Did_Graduate,
+  unique(sdata$Did_Graduate)
+  sdata$Did_Graduate <- recode(sdata$Did_Graduate,
                                 "No" = "0",
                                 "Yes, with another major" = "0",
                                 "Yes, with CS/IT/EMEC" = "1",
   )
-  ddata$Did_Graduate <- as.integer(ddata$Did_Graduate)
+  sdata$Did_Graduate <- as.integer(sdata$Did_Graduate)
   
   
   #Runs Binary/Summary Checker 
-  ddata$Did_Graduate <- BinaryChecker(ddata[, grep("_Graduate$", names(ddata))])
-  ddata$Units_All <- SummaryChecker(ddata[, grep("_Unit_Load$", names(ddata))])
-  ddata$Housing_All <- BinaryChecker(ddata[, grep("_Lived_On_Campus$", names(ddata))])
-  ddata$Tutoring_All <- SummaryChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
+  sdata$Did_Graduate <- BinaryChecker(sdata[, grep("_Graduate$", names(sdata))])
+  sdata$Units_All <- SummaryChecker(sdata[, grep("_Unit_Load$", names(sdata))])
+  sdata$Housing_All <- BinaryChecker(sdata[, grep("_Lived_On_Campus$", names(sdata))])
+  sdata$Tutoring_All <- SummaryChecker(sdata[, grep("_Tutoring_Visits$", names(sdata))])
+
+
+  
+  # Recodes Hispanic Status
+  sdata$Is_Hispanic <- as.character(sdata$Is_Hispanic)
+  sdata$Is_Hispanic <- recode(sdata$Is_Hispanic,
+                                "Non Hispanic" = "0",
+                                "Hispanic" = "1",
+                                .default = "1"
+  )
+
   
   
+  # Adds & Calculates Terms Attended
+  sdata <- sdata %>% 
+    rowwise() %>% 
+    mutate(Terms_Attended = sum(!is.na(c_across(ends_with("_Unit_Load"))))) %>% 
+    ungroup()
   
-  
-  
-  lr1 <- glm(Did_Graduate ~ Is_Hispanic + Gender_Binary + Is_Transfer + Housing_All + Tutoring_All,
-             data = ddata,
-             family = binomial())
-  
-  summary(lr1)
-
-
-  Terms_Attended
-
-
-
-
-
 ##############################
 #   Descriptive Statistics   #
 ##############################
 
-  # Adds & Calculates Terms Attended
-  ddata <- ddata %>% 
-    rowwise() %>% 
-    mutate(Terms_Attended = sum(!is.na(c_across(ends_with("_Unit_Load"))))) %>% 
-    ungroup()
 
+  
+  
+  
   
 # Hispanic Exploration
 #####################
-  
+  t.test(Terms_Attended ~ Is_Hispanic, data = sdata )
   # Sets up Variables
-  nhisdata <- ddata[ddata$Is_Hispanic == 0, ]
-  hisdata <- ddata[ddata$Is_Hispanic == 1, ]
+  nhisdata <- sdata[sdata$Is_Hispanic == "Non Hispanic", ]
+  hisdata <- sdata[sdata$Is_Hispanic == "Hispanic", ]
   
   # Terms Attended
   #####################
@@ -165,19 +190,21 @@ ddata <- pivoted
   
   # Graduation
   #####################
+    chisq.test()
     summary(nhisdata$Did_Graduate_All) # Non-Hispanic Graduation Mean: 0.4934
     summary(hisdata$Did_Graduate_All) # Hispanic Graduation Mean: 0.3746
     
     # T-Test; Significant
-    t.test(nhisdata$Did_Graduate_All, hisdata$Did_Graduate_All, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
+    t.test(nhisdata$Did_Graduate_Binary, hisdata$Did_Graduate_All, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
+    t.test(Did_Graduate_Binary ~ Is_Hispanic, data = sdata )
     
   
 # Transfer Status Exploration
 ##########################################
   
   # Sets up Variables
-  hdata <- ddata[ddata$Is_Transfer == 0, ]
-  tdata <- ddata[ddata$Is_Transfer == 1, ]
+  hdata <- sdata[sdata$Is_Transfer == 0, ]
+  tdata <- sdata[sdata$Is_Transfer == 1, ]
   
   # Terms Attended
   #####################
@@ -211,8 +238,8 @@ ddata <- pivoted
 # Gender Exploration
 ##################################
   # Sets up Variables
-  mdata <- ddata[ddata$Gender_Binary == 0, ] 
-  fdata <- ddata[ddata$Gender_Binary == 1, ]
+  mdata <- sdata[sdata$Gender_Binary == 0, ] 
+  fdata <- sdata[sdata$Gender_Binary == 1, ]
   
   mhisdata <- mdata[mdata$Is_Hispanic == 1, ] # Male Hispanic 
   fhisdata <- fdata[fdata$Is_Hispanic == 1, ] # Female Hispanic
@@ -244,7 +271,7 @@ ddata <- pivoted
     t.test(mdata$Did_Graduate_All, fdata$Did_Graduate_All, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
     
     # Plot of Proportion of Male/Female and Graduate/Non-Graduate
-    g <- ggplot(ddata, aes(Gender_Binary))
+    g <- ggplot(sdata, aes(Gender_Binary))
     p <-  g + geom_bar(aes(fill = as.factor(Did_Graduate_All)))
     ggplotly(p)
 
@@ -252,8 +279,8 @@ ddata <- pivoted
 # Graduation
 ##################################
     # Sets up Variables
-    ngdata <- ddata[ddata$Did_Graduate_All == 0, ] # Didnt Graduate
-    gdata <- ddata[ddata$Did_Graduate_All == 1, ] # Did Graduate
+    ngdata <- sdata[sdata$Did_Graduate_All == 0, ] # Didnt Graduate
+    gdata <- sdata[sdata$Did_Graduate_All == 1, ] # Did Graduate
     
     hngdata <- ngdata[ngdata$Is_Transfer == 0, ] # Home Did not Graduate
     tngdata <- ngdata[ngdata$Is_Transfer == 1, ] # Transfer Did not Graduate
@@ -279,85 +306,90 @@ ddata <- pivoted
       
       # T-Test; Significant
       t.test(hgdata$Terms_Attended, tgdata$Terms_Attended, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
-  
+
+      
 # Dependent Code
 #################
     # Splitting By Data Code
     ####################
-      umwdata <- ddata[ddata$Dependent_Income_Code %in% c(1, 2), ] # Under-Minimum Wage
-      omwdata <- ddata[ddata$Dependent_Income_Code %in% c(3, 4, 5), ] # Over-Minimum Wage
-      over75data <- ddata[ddata$Dependent_Income_Code == 6, ]
+      umwdata <- sdata[sdata$Dependent_Income_Code %in% c(1, 2), ] # Under-Minimum Wage
+      omwdata <- sdata[sdata$Dependent_Income_Code %in% c(3, 4, 5), ] # Over-Minimum Wage
+      over75data <- sdata[sdata$Dependent_Income_Code == 6, ]
       
       summary(umwdata$Did_Graduate_All) # Under Federal Minimum Wage: 0.3552
       summary(omwdata$Did_Graduate_All) # Up to Above 35 to 72k: 0.4432
       summary(over75data$Did_Graduate_All) # 72k and above: 0.4786
       
       
-
-# Survival Analysis
-#######################  
-library(survival)
-library(survminer)
-library(ggsurvfit)   
-      pdata <- read.csv("clean_reorder.csv")
-      pdata <- pdata %>%
-        group_by(Student) %>% 
-        mutate(
-          start = seq(0, n()-1),
-          stop = seq(1, n())
-        )
-
-      pdata$Gender <- as.character(pdata$Gender)
-      pdata$Gender_Binary <- recode(pdata$Gender,
-                                    "Man" = "0",
-                                    "Woman" = "1",
-                                    .default = "1"
-      )
       
       
-      pdata$Graduate <- ifelse(pdata$Did_Graduate == pdata$Term_Code, 1, 0)
-
-
-
-     survmodelcox <- coxph(Surv(time = start, time2 = stop, event = Graduate) ~ Unit_Load + Lived_On_Campus + Num_Tutoring_Visits + Is_Hispanic + Is_Transfer + Gender_Binary, 
-                      data = data = pdata)
-      surv_fit <- survfit(survmodelcox)
-      summary(survmodelcox)
-      ggsurvplot(surv_fit, data = pdata,
-                 xlab = "Time",
-                 ylab = "Survival Probability",
-                 title = "Survival Curves from Cox Proportional Hazards Model",
-                 conf.int = TRUE,    # Confidence intervals
-                 risk.table = TRUE,   # Show risk table
-                 palette = "Dark2")   # Color palette
-  
-      
-
-# if Term code = graduate put a 1
-# Make start and stop colum that takes into account grouped by student (how many rows)
+# Chi-Square Tests      
 
       
+
       
-      survival_object <- Surv(time = ddata$Terms_Attended, event = ddata$Did_Graduate) 
-      surv_model <- survfit(survival_object ~ ddata$Is_Hispanic, data = ddata)
-      ggsurvplot(surv_model, data = ddata)
-      summary(surv_model)
+data <- sdata
       
+# Monique's Chi-Test Stuff
+##########################
+      #Hispanic and Graduation
+      His_grad <- table(data$Is_Hispanic, data$Did_Graduate_Binary)
+      His_grad
+      chisq.test(His_grad) #sig
       
-      #############
-#   Other   #
-#############
-    
-    ## IGNORE
-    # Normality Plot for Home Students
-    x <- mdata$Terms_Attended
-    y = dnorm(x, mean(x), sd(x))
-    plot(x, y)
-    
-    # Normality Plot for Transfer Students
-    x <- fdata$Terms_Attended 
-    y = dnorm(x, mean(x), sd(x))
-    plot(x, y)
-    
-    
-  write.csv(ddata, file = "ddata.csv") # Writes Data to CSV
+      mean(data$Is_Hispanic)
+      
+      sdata <- read.csv("trimmed_pivoted_df.csv")
+      
+      mean(hisdata$Terms_Attended)
+      nhisdata <- sdata[sdata$Is_Hispanic == "Non Hispanic", ]
+      hisdata <- sdata[sdata$Is_Hispanic == "Hispanic", ]      
+      
+      femaledata <- sdata[sdata$Gender_Binary == "Female", ]
+      maledata <- sdata[sdata$Gender_Binary == "Male", ]
+      
+      ### Roberts HSist
+      His_grad <- table(sdata$Is_Hispanic, sdata$Did_Graduate_Binary)
+      His_grad
+      chisq.test(His_grad)
+      #Non Hispanic Students
+        #          Did Not Graduate Graduated
+        # Female               49        45
+        # Male                261       267
+      #Hispanic Students
+        #          Did Not Graduate Graduated
+        # Female               44        22
+        # Male                193       151
+193 + 151
+151/344      
+#Gender and Graduation
+      Gender <- table(data$Did_Graduate_Binary, data$Gender_Binary)
+      Gender
+      chisq.test(Gender) #non sig
+      
+      #Transfer and Graduation
+      Trans_grad <- table(data$Did_Graduate_Binary, data$Is_Transfer)
+      Trans_grad
+      chisq.test(Trans_grad) #sig
+      
+      #Hispanic and Transfer
+      His_Tran <- table(data$Is_Hispanic, data$Is_Transfer)
+      His_Tran
+      chisq.test(His_Tran) #non sig
+      
+      #Housing and graduation
+      Hous_Grad <- table(data$Did_Graduate_Binary, data$Housing_All)
+      Hous_Grad
+      chisq.test(Hous_Grad) #sig
+      #students not in housing = higher grad rates
+      
+      #Tutoring & graduation
+      tut_grad <- table(data$Tutoring_bin, data$Did_Graduate_Binary)
+      chisq.test(tut_grad) #sig
+      
+      #Avg Units & graduation
+      units_grad <- table(data$UnitsBins, data$Did_Graduate_Binary)
+      units_grad
+      
+      chisq.test(units_grad)
+      
