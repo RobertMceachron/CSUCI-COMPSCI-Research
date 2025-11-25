@@ -126,7 +126,8 @@ Finally, rows corresponding to terms outside of a student's enrollment
 in the computer science program were excluded (*n* = 640 rows), leaving
 the final dataset for pivoting (N = 5702 rows).
 
-::: panel-tabset
+::: {.panel-tabset}
+
 #### Final Cleaning Code
 
 ```{r}
@@ -277,6 +278,7 @@ orig_data %>%
   distinct() %>%
   filter(Term_Desc == "Fall 2025")
 ```
+
 :::
 
 ### Data Pivoting
