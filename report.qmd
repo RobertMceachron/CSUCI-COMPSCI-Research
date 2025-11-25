@@ -9,6 +9,7 @@ format:
     toc-expand: 2
     toc-location: left
     embed-resources: true
+    number-sections: true
 execute:
   warning: false
   message: false
@@ -44,13 +45,20 @@ institutions design targeted interventions to support at-risk computer
 science students, ultimately contributing to a more diverse and
 inclusive technology workforce that better serves society as a whole.
 
-# Method
+# Methods
 
-## Data
+The following sections describe the process behind acquiring, preparing,
+and analyzing the data. The @sec-data section [characterizes the original dataset](@sec-data_descr), and then explains how and why the original dataset was [cleaned](@sec-data_clean),
+[pivoted](@sec-data_pivot), and [subset](@sec-data_subset). The @sec-descr_stats section graphs key
+metrics of the [first](@sec-descr_1) and [second](@sec-descr_2) samples taken from the dataset. Finally, the @sec-stats_back
+section details the theoretical foundations and assumptions of [chi-square](@sec-cs_back), [logistic regression](@sec-lr_back), and [survival analysis](@sec-sa_back) — the three statistical methods used
+to interpret the data.
 
-All code was analyzed using R version 4.5.2.
+## Data {#sec-data}
 
-### Data Description
+All data was analyzed using R version 4.5.2.
+
+### Data Description {#sec-data_descr}
 
 The data was obtained from the Office of Institutional Research (IR) and
 included 1,691 students enrolled in the Department of Computer Science
@@ -88,7 +96,7 @@ are dynamic across each student's terms:
   Num_Tutoring_Visits: integer, total count of visits to LRC, WMC, and STEM Center
 ```
 
-### Data Cleaning
+### Data Cleaning {#sec-data_clean}
 
 The following process was conducted to focus on non-current
 undergraduate students who declared only one major throughout their
@@ -126,8 +134,7 @@ Finally, rows corresponding to terms outside of a student's enrollment
 in the computer science program were excluded (*n* = 640 rows), leaving
 the final dataset for pivoting (N = 5702 rows).
 
-::: {.panel-tabset}
-
+::: panel-tabset
 #### Final Cleaning Code
 
 ```{r}
@@ -278,10 +285,9 @@ orig_data %>%
   distinct() %>%
   filter(Term_Desc == "Fall 2025")
 ```
-
 :::
 
-### Data Pivoting
+### Data Pivoting {#sec-data_pivot}
 
 The dataset was pivoted to represent one row per student in order to
 ensure compatibility with statistical methods and reduce redundancy.
@@ -417,7 +423,7 @@ for (current_row in 1:nrow(cleaned_and_reordered)) {
 }
 ```
 
-### Data Subsetting
+### Data Subsetting {#sec-data_subset}
 
 Binning, Down-sampling
 
@@ -426,7 +432,7 @@ visits the student attended across the number of terms they were
 enrolled in. These numbers were categorized into No tutoring, low (1 to
 5 visits), moderate (6 to 10) and high (over 11 visits).
 
-## Descriptive Statistics
+## Descriptive Statistics {#sec-descr_stats}
 
 ```{r}
 #| message: false
@@ -482,7 +488,7 @@ ddata <- ddata %>%
 sdata <- ddata
 ```
 
-### Sample #1
+### Sample #1 {#sec-descr_1}
 
 Descriptive analyses were conducted to summarize the characteristics of
 those in the first sample. Our sample included a total of 1,091
@@ -564,23 +570,23 @@ ggplot(sdata, mapping = aes(x = Units_All)) +
             axis.title.x = element_text(size = 15L))
 ```
 
-### Sample #2
+### Sample #2 {#sec-descr_2}
 
-# Statistical Analyses
+# Statistical Analyses {#sec-stats_back}
 
-### Chi-Square
-
-#### Theory
-
-#### Assumptions
-
-### Logistic Regression
+### Chi-Square {#sec-cs_back}
 
 #### Theory
 
 #### Assumptions
 
-### Survival Analysis
+### Logistic Regression {#sec-lr_back}
+
+#### Theory
+
+#### Assumptions
+
+### Survival Analysis {#sec-sa_back}
 
 #### Theory
 
@@ -685,9 +691,9 @@ chi_gender_grad_result <- chisq.test(chi_gender_grad)
 #### Hispanic Status
 
 Due to Channel Islands being a Hispanic Serving Institution (HSI),
-exploration of students' Hispanic Status was important to the researchers. The
-following chart showcases the makeup of Hispanic and Non-Hispanic
-students in the Computer Science Department.
+exploration of students' Hispanic Status was important to the
+researchers. The following chart showcases the makeup of Hispanic and
+Non-Hispanic students in the Computer Science Department.
 
 ```{r}
 #| message: false
@@ -727,9 +733,10 @@ students graduate at a significantly lower rate.
 
 #### Transfer Status
 
-Channel Islands receives lots of transfer students due to the institution's well-established relationships
-with local community colleges and the institution's relatively
-low cost. This is supported by the data we received below.
+Channel Islands receives lots of transfer students due to the
+institution's well-established relationships with local community
+colleges and the institution's relatively low cost. This is supported by
+the data we received below.
 
 ```{r}
 #| message: false
@@ -830,8 +837,9 @@ counterparts.s
 ### Survival Analysis
 
 *Important Note: The Cox Proportional Hazards Model was incorrectly
-implemented to this dataset due to the assumption of non-informative censoring being broken. Regardless, it was left in to test the
-analysis on the dataset in the pursuit of learning.*
+implemented to this dataset due to the assumption of non-informative
+censoring being broken. Regardless, it was left in to test the analysis
+on the dataset in the pursuit of learning.*
 
 The Cox Proportional Hazards model was run on the event of graduation,
 with the covariates of number of tutoring visits, Hispanic status,
