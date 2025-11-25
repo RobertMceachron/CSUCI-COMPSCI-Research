@@ -534,7 +534,7 @@ ggplot(sdata, mapping = aes(x = Housing_All, fill = Housing_All)) +
       geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) 
   
 # Graduation 
-ggplot(sdata, mapping = aes(x = Did_Graduate_Binary, fill = Did_Graduate_Binary)) +
+ggplot(sdata, mapping = aes(x = Did_Graduate, fill = Did_Graduate)) +
       geom_bar() +
       scale_fill_manual(values= c("#A90806","#E798A1"), guide="none") + 
       labs(x = "Graduation Status", y = "Number of Students") +
