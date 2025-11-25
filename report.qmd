@@ -1,5 +1,5 @@
 ---
-title: "An analysis of undergraduate major attrition rates within the department of computer science at CSUCI"
+title: "An analysis of undergraduate major graduation rates within the department of computer science at CSUCI"
 subtitle: "MATH 398 (Fall 2025)"
 author: "Monique Calatayud, Robert McEachron, and Morgan McMurray"
 format: 
@@ -29,13 +29,13 @@ by white males. Limited minority representation within the profession
 contributes to the exclusion of diverse perspectives in product design,
 which can result in algorithmic harm—technology-driven threats to civil
 rights and democratic values. Understanding the factors contributing to
-underrepresentation in computer science is therefore critical to
+under-representation in computer science is therefore critical to
 fostering equitable and inclusive technological development. To the best
 of our knowledge, no such analysis has been conducted on students
-currently attending California State University Channel Islands (CSUCI).
-Given that CSUCI is a Hispanic-Serving Institution.
+currently attending California State University Channel Islands (CSUCI),
+a Hispanic-Serving Institution.
 
-Thus, the current study will examine demographics among student's
+Thus, the current study will examine demographics among students
 enrolled in the Computer Science Program at CSUCI, while painting a
 holistic picture of the department. Additionally, factors predicting
 graduation rates among students in the program will expose problem areas
@@ -53,7 +53,7 @@ All code was analyzed using R version 4.5.2.
 ### Data Description
 
 The data was obtained from the Office of Institutional Research (IR) and
-included 1,091 students enrolled in the Department of Computer Science
+included 1,691 students enrolled in the Department of Computer Science
 at California State University Channel Islands (CSUCI) between Fall 2015
 and Fall 2025. Fall, Winter, Spring, and Summer terms were included.
 There was a total of 11,407 rows, each representing one term for a
@@ -63,29 +63,29 @@ The following includes an explanation of our static variables, meaning
 they do not change across the student's terms:
 
 ```         
-  Student: Numerical annoymized student identifier
-  Term_Code: numeric identifier for term
-  Term_Desc: word description of the term that corresponds to Term_Code
+  Student: numeric annoymized student identifier
   First_CI_Term: numeric identifier for the term that students started at CI
-  First_CI_Term_Code: word description of First_CI_Term
-  First_CS_Term: numeric identifier for the term that students started 
-  First_CS_Term_Code: word description of First_CS_Term
-  Did_Graduate: binary, 1 for yes, 0 for no
+  First_CI_Term_Desc: word description of First_CI_Term
+  First_CS_Term: numeric identifier for the term that students started a major under the Department of Computer Science at CSUCI
+  First_CS_Term_Desc: word description of First_CS_Term
+  Is_Transfer: binary, 1 for yes, 0 for no
+  Did_Graduate: numeric identifier for the term that the student graduated from CSUCI, or 0 if they did not graduate
+  Dependent_Income_Code: categorical, values 1-7 representing ranges of the student's parents' gross annual income (if the student was considered a "dependent"), or 8 if there is no response
 ```
 
 The following variables are time series dependent, meaning the values
 are dynamic across each student's terms:
 
 ```         
-  Time Series Dependent (values change across each student's term)
-  Is_Hispanic: binary, 1 for yes, 0 for no
-  Gender: Categorical, values include Man, Woman, and Non-Binary
-  Major1, Major2, Major3: major(s) that students had declared during the term in question
-  Major1 Descr, Major2 Descr, Major3 Descr: 
-  Is_Transfer: binary, 1 for yes, 0 for no       
-  Unit_Load: numeric, number of units attempted
-  Lived_On_Campus: binary, 1 for yes, 0 for no
-  Num_Tutoring_Visits: integer, count of visits to LRC, WMC, and STEM Center
+  Term_Code: numeric identifier for term
+  Term_Desc: word description of the term that corresponds to Term_Code
+  Is_Hispanic: binary; 1 for yes, 0 for no
+  Gender: categorical; values include "Man," "Woman," and "Non-Binary"
+  major1, major2, major3: character string codes for the major(s) that students had declared during the term in question
+  major1 Descr, major2 Descr, major3 Descr: word description(s) of the major(s) in major1, major2, and major3
+  Unit_Load: numeric, number of units attempted during a given term
+  Lived_On_Campus: binary; 1 for yes, 0 for no
+  Num_Tutoring_Visits: integer, total count of visits to LRC, WMC, and STEM Center
 ```
 
 ### Data Cleaning
@@ -94,26 +94,40 @@ The following process was conducted to focus on non-current
 undergraduate students who declared only one major throughout their
 academic trajectory.
 
-To simplify the data, term description and the major1-3 columns were
-removed. The major description columns were renamed to include
-underscores for R accessibility.
+To simplify the data, `Term_Desc` and the `major1`-`major3` columns were
+removed. The columns `major1 Descr`, `major2 Descr` and `major3 Descr`
+were renamed to include underscores for R accessibility.
 
-Multiple remaining rows per student had the same term code but different
-dependent codes. The last unique term row per student was maintained;
-the rest were removed (*n* = 2150 rows). Students whose last term row
-did not match their graduation term code were also removed (*n* = 277
-rows), as time series variables were not included in their graduation
-term. Additionally, current students (*n* = 2,053 rows), students who
-declared two or more majors at any term (*n* = 573 rows), and those who
-were in a Master's program (*n* = 12 rows) were removed. After these
-exclusions, N = 6342 term rows and N = 1091 students remained.
+Multiple remaining rows per student had the same `Term_Code` but
+different `Dependent_Income_Code`s. The last unique term row per student
+was maintained; the rest were removed (*n* = 2150 rows). Students whose
+last term row did not match their graduation term code were also removed
+(*n* = 277 rows), as time series variables were not included in their
+graduation term. Additionally, current students (*n* = 2,053 rows),
+students who declared two or more majors at any term (*n* = 573 rows),
+and those who were in a Master's program (*n* = 12 rows) were removed.
+After these exclusions, N = 6342 term rows and N = 1091 students
+remained.
 
-The Did_Graduate column was re-coded to represent students who: Did not
-graduate (0), graduated with one of the majors within the computer
-science program (1), or graduated with another major (0). Finally, rows
-corresponding to terms outside of a student's enrollment in computer
-science program were excluded (*n* = 640 rows), leaving the final
-dataset for pivoting (N = 5702 rows).
+The `Did_Graduate` column was re-coded to represent students who: did
+not graduate ($Did\_Graduate = 0$), graduated with one of the majors
+within the computer science program ($Did\_Graduate \neq 0$ and
+`major1_Descr` was either `"BS: Computer Science"`, `"BS: Information`
+`Technology"`, `"BS: Mechatronics Engineering"`, or
+`"BS: Mechatronics"`), or graduated with another major
+($Did\_Graduate \neq 0$ and `major1_Descr` was not any of the majors
+offered by the Department of Computer Science). Students who either did
+not graduate or graduated with a major outside of the Department of
+Computer Science were eventually re-coded as 0, and students who
+graduated with one of the majors within the computer science program
+were eventually re-coded as 1.
+
+Finally, rows corresponding to terms outside of a student's enrollment
+in the computer science program were excluded (*n* = 640 rows), leaving
+the final dataset for pivoting (N = 5702 rows).
+
+::: panel-tabset
+#### Final Cleaning Code
 
 ```{r}
 # Load necessary libraries
@@ -121,20 +135,27 @@ library(tidyverse)
 library(readxl)
 
 # Read excel data into dataframe
+# Set the max number of rows to use in creating the guess type for each column
+# This helps get rid of warnings about guess types mismatching inputs read from the actual rows
+# The number of rows used to determine column type is the max because our dataset is sparse
 orig_data <- read_excel("CS Major Data 2025-10-10.xlsx", guess_max = min(8400, n_max = NULL))
 
 # Get rid of term description columns and major1, major2, and major3 columns (we have description columns for these instead)
-removed_term_descs_and_major_codes <- orig_data %>% select(-one_of("Term_Desc", "First_CI_Term_Desc", "First_CS_Term_Desc", "major1", "major2", "major3"))
+removed_term_descs_and_major_codes <- orig_data %>% 
+  select(-one_of("Term_Desc", "First_CI_Term_Desc", "First_CS_Term_Desc", "major1", "major2", "major3"))
 
 # Remove duplicates, retain last of near-duplicate rows (1 row per term per student)
-de_duped_reduced <- removed_term_descs_and_major_codes %>% group_by(Student, Term_Code) %>% slice_tail(n = 1) %>% ungroup()
+de_duped_reduced <- removed_term_descs_and_major_codes %>% 
+  group_by(Student, Term_Code) %>% 
+  slice_tail(n = 1) %>% 
+  ungroup()
 
 # Rename major description columns to include underscores (makes them easier to work with)
 names(de_duped_reduced)[which(colnames(de_duped_reduced) == "major1 Descr")] <- "major1_Descr"
 names(de_duped_reduced)[which(colnames(de_duped_reduced) == "major2 Descr")] <- "major2_Descr"
 names(de_duped_reduced)[which(colnames(de_duped_reduced) == "major3 Descr")] <- "major3_Descr"
 
-#Remove students whose last term row doesn't match their graduation code
+# Identify students who graduated, but their last term row doesn't match their graduation code
 mismatch <- de_duped_reduced %>% 
   filter(Did_Graduate != 0) %>% 
   group_by(Student) %>% 
@@ -142,10 +163,12 @@ mismatch <- de_duped_reduced %>%
   filter(Term_Code != Did_Graduate) %>% 
   pull(Student)
 
+# Remove students whose last term row doesn't match their graduation code
 ddr_filtered_mismatch <- de_duped_reduced %>% 
   filter(!Student %in% mismatch)
 
-#Identify current students and remove them
+# Identify current students and remove them
+# 2258 = "Fall 2025"
 ddrfm_removed_current_students <- ddr_filtered_mismatch %>% 
   group_by(Student) %>% 
   filter(!any(Term_Code == 2258)) %>% 
@@ -158,32 +181,103 @@ only_single_majors <- ddrfm_removed_current_students %>%
   ungroup()
 
 # Remove students who graduated with a master's program in computer science
-only_undergrads <- only_single_majors %>% group_by(Student) %>% filter(!any(major1_Descr == "MS: Computer Science")) %>% ungroup()
+only_undergrads <- only_single_majors %>% 
+  group_by(Student) %>% 
+  filter(!any(major1_Descr == "MS: Computer Science")) %>% 
+  ungroup()
 
-# Recode Did_Graduate to the following scheme:
+# ------------------------------------------------------------------------------------------------------------------------------------------------
+# Re-code "Did_Graduate" to the following scheme:
 # 0 --> No
-# nonzero AND major1_Descr == one of: "BS: Computer Science," "BS: Information Technology," "BS: Mechatronics Engineering," "BS: Mechatronics" --> Yes, with CS/IT/EMEC
-# nonzero AND major1_Decr is anything else --> Yes, with another major
+# nonzero AND major1_Descr equals one of: "BS: Computer Science," "BS: Information Technology," "BS: Mechatronics Engineering," "BS: Mechatronics"
+# --> Yes, with CS/IT/EMEC
+# nonzero AND major1_Descr is anything else 
+# --> Yes, with another major
+# ------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Get students who did not graduate with majors from the CS program
 cs_dept_majors <- c("BS: Computer Science", "BS: Information Technology", "BS: Mechatronics Engineering", "BS: Mechatronics")
 students_wo_cs <- only_undergrads %>% 
   group_by(Student) %>% slice_tail(n = 1) %>% 
-  filter(!(major1_Descr %in% cs_dept_majors)) %>% ungroup() %>% pull(Student)
+  filter(!(major1_Descr %in% cs_dept_majors)) %>% 
+  ungroup() %>% 
+  pull(Student)
 
+# Recode "Did_Graduate" according to the scheme above
 recoded_graduation <- only_undergrads %>% 
-  group_by(Student) %>% mutate(Did_Graduate = case_when(Did_Graduate == 0 ~ "No",
-                                                        (Did_Graduate != 0) & (Student %in% students_wo_cs) ~ "Yes, with another major",
-                                                        TRUE ~ "Yes, with CS/IT/EMEC")) %>% ungroup()
+  group_by(Student) %>% 
+  mutate(Did_Graduate = case_when(Did_Graduate == 0 ~ "No",
+                                  (Did_Graduate != 0) & (Student %in% students_wo_cs) ~ "Yes, with another major",
+                                  TRUE ~ "Yes, with CS/IT/EMEC")) %>% 
+  ungroup()
 
 # Exclude all rows outside of when students were enrolled in a program under the department of computer science
-only_cs_rows <- recoded_graduation %>% group_by(major1_Descr) %>% filter(major1_Descr %in% cs_dept_majors)
+only_cs_rows <- recoded_graduation %>% 
+  group_by(major1_Descr) %>% 
+  filter(major1_Descr %in% cs_dept_majors)
 
 # Reorder columns to put static data in one area of the dataframe, and time-series in the other
-cleaned_and_reordered <- only_cs_rows %>% select(Student, Is_Hispanic, Gender, 
-                                                     Is_Transfer, Dependent_Income_Code, 
-                                                     First_CI_Term, First_CS_Term, major1_Descr, 
-                                                     major2_Descr, major3_Descr, Did_Graduate, Term_Code, 
-                                                     Unit_Load, Lived_On_Campus, Num_Tutoring_Visits)
+cleaned_and_reordered <- only_cs_rows %>% 
+  select(Student, Is_Hispanic, Gender, Is_Transfer, Dependent_Income_Code, First_CI_Term, First_CS_Term, major1_Descr, 
+         major2_Descr, major3_Descr, Did_Graduate, Term_Code, Unit_Load, Lived_On_Campus, Num_Tutoring_Visits)
 ```
+
+#### Step Justifications
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+library(readxl)
+
+# Read excel data into dataframe
+# Set the max number of rows to use in creating the guess type for each column
+# This helps get rid of warnings about guess types mismatching inputs read from the actual rows
+# The number of rows used to determine column type is the max because our dataset is sparse
+orig_data <- read_excel("CS Major Data 2025-10-10.xlsx", guess_max = min(8400, n_max = NULL))
+```
+
+**Confirmation of entirely duplicate rows:**
+
+```{r}
+sum(duplicated(orig_data))
+```
+
+**Confirmation of nearly duplicate rows --- and that
+`Dependent_Income_Code` was the problem:**
+
+```{r}
+orig_data %>% 
+  distinct() %>% 
+  group_by(Student, Term_Code) %>% 
+  add_tally(sort = TRUE) %>% 
+  filter(n > 1) %>%
+  summarize(n_distinct(Dependent_Income_Code)) %>%
+  ungroup()
+```
+
+**Confirmation of the presence of students who graduated, but their last
+term code did not match their graduation term code:**
+
+```{r}
+orig_data %>%
+  select(Student, Term_Code, Did_Graduate) %>%
+  distinct() %>%
+  group_by(Student) %>% 
+  slice_tail(n = 1) %>%
+  ungroup() %>%
+  filter((Did_Graduate > 0) & (Term_Code != Did_Graduate))
+  
+```
+
+**Confirmation that `Term_Code` 2258 is "Fall 2025":**
+
+```{r}
+orig_data %>% 
+  select(Term_Code, Term_Desc) %>% 
+  distinct() %>%
+  filter(Term_Desc == "Fall 2025")
+```
+:::
 
 ### Data Pivoting
 
@@ -193,18 +287,21 @@ ensure compatibility with statistical methods and reduce redundancy.
 Because the number of terms a student was enrolled in a major from the
 Computer Science Program varies by student, dataset pivoting was done
 through a for loop that created new rows based on whether a change in
-the "Student" column was observed. A detailed walk through of the code
+the `Student` column was observed. A detailed walk through of the code
 is written below.
 
-The primary statistical method in this analysis is logistical
-regression. Since the original data was collected as a time series,
-independence (one of the assumptions of logistic regression) was
-violated. Pivoting the original dataset such that each observation is an
-individual student creates independence and, in part, assures that the
-assumptions for logistic regression are met.
+The primary statistical method in this analysis is logistic regression.
+Since the original data was collected as a time series, independence
+(one of the assumptions of logistic regression) was violated. Pivoting
+the original dataset such that each observation is an individual student
+creates independence and, in part, assures that the assumptions for
+logistic regression are met.
 
-Due to the small sample size of non-binary (*n* = 1), their value was
-re-coded as being female for future analyses.
+Due to the small sample size of non-binary (*n* = 1) students, their
+value was re-coded as being female for future analyses. Personal
+experience of gender-based marginalization by one of the researchers ---
+a non-binary person majoring in computer science --- informed this
+decision.
 
 ```{r}
 # Get first row of all static data columns
@@ -227,8 +324,8 @@ current_entry <- 1
 for (current_row in 1:nrow(cleaned_and_reordered)) {
   
   # If the current student number is different from the saved student number,
-  # Save new student number and their majors, reset term number,
-  # and add new row with static data
+  # Save the new student number and their majors, reset term number,
+  # and add a new row with static data
   if (cleaned_and_reordered[current_row, "Student"] != current_id) {
     current_id <- cleaned_and_reordered[current_row, "Student"]
     current_major1 <- cleaned_and_reordered[current_row, "major1_Descr"]
@@ -320,11 +417,12 @@ for (current_row in 1:nrow(cleaned_and_reordered)) {
 
 ### Data Subsetting
 
-Binning, Down-sampling Tutoring_All was created by summing up the total
-number of tutoring visits the student attended across the number of
-terms they were enrolled in. These numbers were categorized into No
-tutoring, low (1 to 5 visits), moderate (6 to 10) and high (over 11
-visits).
+Binning, Down-sampling
+
+`Tutoring_All` was created by summing up the total number of tutoring
+visits the student attended across the number of terms they were
+enrolled in. These numbers were categorized into No tutoring, low (1 to
+5 visits), moderate (6 to 10) and high (over 11 visits).
 
 ## Descriptive Statistics
 
@@ -368,7 +466,7 @@ ddata$Did_Graduate <- recode(ddata$Did_Graduate,
 
 
 #Runs Binary/Summary Checker
-# ddata$Did_Graduate <- BinaryChecker(ddata[, grep("_Graduate$", names(ddata))])
+ddata$Did_Graduate <- BinaryChecker(ddata[, grep("_Graduate$", names(ddata))])
 ddata$Units_All <- SummaryChecker(ddata[, grep("_Unit_Load$", names(ddata))])
 ddata$Housing_All <- BinaryChecker(ddata[, grep("_Lived_On_Campus$", names(ddata))])
 ddata$Tutoring_All <- SummaryChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
@@ -541,8 +639,8 @@ dataset.
 
 Computer science programs have historically under-represented women and
 non-binary populations. This same relationship can be seen from the data
-from Channel Islands. Due to the small sample size of non-binary (*n* =
-1), their value was re-coded as being female for future analyses.
+from Channel Islands. Recall that due to the small sample size of
+non-binary (*n* = 1), their value was re-coded as being female.
 
 ```{r}
 #| message: false
@@ -585,9 +683,9 @@ chi_gender_grad_result <- chisq.test(chi_gender_grad)
 #### Hispanic Status
 
 Due to Channel Islands being a Hispanic Serving Institution (HSI),
-exploration of student's Hispanic Status was important to us. The
+exploration of students' Hispanic Status was important to the researchers. The
 following chart showcases the makeup of Hispanic and Non-Hispanic
-student's in the Computer Science Department.
+students in the Computer Science Department.
 
 ```{r}
 #| message: false
@@ -596,7 +694,7 @@ nhisdata <- ddata[ddata$Is_Hispanic == 0, ]
 hisdata <- ddata[ddata$Is_Hispanic == 1, ]
 ```
 
-Student's from both identity statuses attended same amount of terms
+Students from both identity statuses attended same amount of terms
 (*Winter, Fall, Spring, Summer*) with non-Hispanic students attending a
 mean of 5.638 terms and Hispanic students 5.370. A two sided t-test
 determined no significant difference between the two groups (*p* \>
@@ -609,7 +707,7 @@ mean(hisdata$Terms_Attended) # Hispanic Terms Mean
 t.test(hisdata$Terms_Attended, nhisdata$Terms_Attended, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
 ```
 
-Hispanic student's were found to graduate 37.5% of the time, whereas
+Hispanic students were found to graduate 37.5% of the time, whereas
 their Non-Hispanic counterparts graduated 49.3% of the time. Further
 examination revealed a significant difference in graduation rate among
 the two groups, *t*(1449)= 4.73, *p* \< .001.
@@ -627,8 +725,8 @@ students graduate at a significantly lower rate.
 
 #### Transfer Status
 
-Channel Islands receives lots of transfer student's due to programs in
-place at the local community colleges and the institutions relatively
+Channel Islands receives lots of transfer students due to the institution's well-established relationships
+with local community colleges and the institution's relatively
 low cost. This is supported by the data we received below.
 
 ```{r}
@@ -639,10 +737,10 @@ tdata <- ddata[ddata$Is_Transfer == 1, ]
 ```
 
 It was found that student's who started their academic journey at
-Channel Islands attend more terms (*M* = 5.96) as those who transfer
+Channel Islands attend more terms (*M* = 5.96) than those who transfer
 (*M* = 5.15) with a significant difference, *t*(1282) = 4.957, *p* \<
 .001. Interestingly, this difference was not as large as expected as
-those who transfer should theoretically need far less classes then those
+those who transfer should theoretically need far less classes than those
 who start at the institution.
 
 ```{r}
@@ -656,7 +754,7 @@ t.test(tdata$Terms_Attended, hdata$Terms_Attended, alternative = "two.sided", va
 
 When taking into account graduation rates, the lack of disparity between
 terms attended for transfer and non-transfer student becomes apparent.
-Student's who started at Channel Islands graduate 35.61% of the time
+Students who started at Channel Islands graduate 35.61% of the time
 whereas those who transfer graduate 51.98% of the time. A t-test
 determined that this was a significant difference, *t*(1552) = 6.61, *p*
 \> .001.
@@ -674,7 +772,7 @@ t.test(tdata$Did_Graduate, hdata$Did_Graduate, alternative = "two.sided", var.eq
 
 The Computer Science Department at Channel Islands includes the majors
 of Computer Science, Mechatronics and Information Technology. Due to
-some student's double majoring or changing programs the data includes
+some students double majoring or changing programs the data includes
 majors that are outside this category.
 
 Our major count was:
@@ -693,7 +791,7 @@ print(dfmajor)
 dfmajor <- dfmajor[dfmajor$n > 20, ] # Removes major with under 20 students
 ```
 
-Due to the small sample size, majors with under 20 student's were
+Due to the small sample size, majors with under 20 students were
 excluded for the following chart:
 
 #### Gender and Hispanic Status
@@ -730,8 +828,7 @@ counterparts.s
 ### Survival Analysis
 
 *Important Note: The Cox Proportional Hazards Model was incorrectly
-implemented to this dataset due to the assumption of censoring being
-non-informative being broken. Regardless, it was left in to test the
+implemented to this dataset due to the assumption of non-informative censoring being broken. Regardless, it was left in to test the
 analysis on the dataset in the pursuit of learning.*
 
 The Cox Proportional Hazards model was run on the event of graduation,
