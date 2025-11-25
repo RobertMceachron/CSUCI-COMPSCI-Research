@@ -26,15 +26,17 @@ knitr:
 
 Despite ongoing efforts to increase diversity in the technology sector,
 computer science programs continue to be disproportionately represented
-by white males. Limited minority representation within the profession
+by white males (citation and numbers needed). Limited minority representation within the profession
 contributes to the exclusion of diverse perspectives in product design,
-which can result in algorithmic harm—technology-driven threats to civil
-rights and democratic values. Understanding the factors contributing to
+which can result in algorithmic harm --- technology-driven threats to civil
+rights and democratic values (citation needed). Understanding the factors contributing to
 under-representation in computer science is therefore critical to
 fostering equitable and inclusive technological development. To the best
 of our knowledge, no such analysis has been conducted on students
 currently attending California State University Channel Islands (CSUCI),
 a Hispanic-Serving Institution.
+
+(TODO: insert lit review of previous, similar work)
 
 Thus, the current study will examine demographics among students
 enrolled in the Computer Science Program at CSUCI, while painting a
@@ -930,8 +932,8 @@ Text*. Springer.
 
 ## Acknowledgements
 
-A big thanks to Dr. Kreshenko for giving us the platform to be able to
-conduct this research. Her continued support helped us
+A big thanks to Dr. Kryshchenko for giving us the platform to be able to
+conduct this research. Her continued support was much appreciated throughout the entire process.
 
 ```{r}
 #                      /^--^\     /^--^\     /^--^\
