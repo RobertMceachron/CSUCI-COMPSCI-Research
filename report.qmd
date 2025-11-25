@@ -378,6 +378,8 @@ ddata <- ddata %>%
         rowwise() %>% 
         mutate(Terms_Attended = sum(!is.na(c_across(ends_with("_Unit_Load"))))) %>%
         ungroup()
+
+sdata <- ddata
 ```
 
 ### Sample #1
@@ -478,22 +480,58 @@ ggplot(sdata, mapping = aes(x = Units_All)) +
 
 #### Assumptions
 
-A binary logistic regression was used to predict graduation.
-
-A binary logistic regression is a multivariate prediction method that
-allows for categorical and continuous variables to predict a binary
-outcome. The logistic function, the sigmoid curve, models the
-relationship between the predictor variables the probability of the
-outcome.
-
-Odd ratio compares the probability of the event -Include the math, which
-variables used, assumptions, etc
-
 ### Survival Analysis
 
 #### Theory
 
+Survival Analysis is a category of statistical methods in which the
+variable being studied is measured until a certain event occurs,
+allowing for unique observations to be pulled from the data (Kleinbaum &
+Klien, 2012). Survival analysis can account for participants who drop
+out of the study prematurely before completing the event of interest. By
+accounting for this group, survival analysis can have a larger sample
+size and often explain more variance in the dependent variable. As
+mentioned, there are many types of survival analyses, but the analysis
+used in our study is the Cox Proportional Hazards Model.
+
+The Cox Proportional Hazards Model is a semiparametric test that enables
+statisticians to account for variables that affect the outcome of
+interest otherwise known as their survival time (Kleinbaum & Klien,
+2012). Due to its semiparamteric nature, it allows for a non-normal
+distribution of the baseline hazard function, enabling the use of time
+as a variable. Additionally, allows statisticians to account for
+time-varying predictor variables, not just variables measured at the
+beginning of a study. Its formula is as follows:
+
+$h(t|\mathbf{X}) = h_0(t)\overset{\sum_{}X\mathrm{}_{i}\boldsymbol{\beta}\mathrm{}_{i}}{\mathrm{e}^{i = 1}}$
+
+The $h(t|\mathbf{X})$ portion of the equation refers to hazard rate at a
+certain time for individuals, meaning their likelihood of the outcome of
+interest. $h_0(t)$ refers to the baseline hazard rate at a given time,
+with
+$\overset{\sum_{}X\mathrm{}_{i}\boldsymbol{\beta}\mathrm{}_{i}}{\mathrm{e}^{i = 1}}$
+being a linear combination of each covariate (predictor variable) along
+with their coefficient (${\beta}\mathrm{}_{i}$). The coefficient tells
+us the change in log-hazard ratio for a one unit change in the covariate
+($X\mathrm{}_{i}$). Now that we understand the formula, the assumptions
+will be examined.
+
 #### Assumptions
+
+As with most statistical methods, there are a few assumptions that the
+Cox Proportional Hazards model must meet before its use (Kleinbaum &
+Klien, 2012). First, the hazard ratio must be the same over the period
+of time, meaning that the effect a covariate has on the survival
+likelihood must be the same across time. Second, observations must be
+independent of each other, meaning that one participant's drop-out does
+not affect the likelihood of another dropping out. Third, censoring must
+be non-informative. This assumption says that censoring must be
+independent, meaning no group has preferential attrition due to the
+event of interest. Lastly, it is assumed that the predictors have a
+linear relationship with the log hazard rate, and there is no
+multicollinearity among them. Now that we have discussed the backgrounds
+to the statistics we will be using, lets look at how they worked on our
+dataset.
 
 # Results
 
@@ -689,19 +727,75 @@ counterparts.s
 
 ### Logistic Regression
 
--   Add a table
-
--   First, we need to examine what assumptions blah blah (charts and
-    graphs to show linearity etc.)
-
--   Will include information from the logistic regression aka results
-
--   Will include interpretation of the results
-
--   Will include any charts regarding what it looks like (i.e. line of
-    best fit and assumptions)
-
 ### Survival Analysis
+
+*Important Note: The Cox Proportional Hazards Model was incorrectly
+implemented to this dataset due to the assumption of censoring being
+non-informative being broken. Regardless, it was left in to test the
+analysis on the dataset in the pursuit of learning.*
+
+The Cox Proportional Hazards model was run on the event of graduation,
+with the covariates of number of tutoring visits, Hispanic status,
+gender, lived on campus, and transfer status.
+
+```{r}
+# Cox Proportional Hazards Model w/All Variables 
+CoxAll <- coxph(Surv(time = start, time2 = stop, event = Did_Graduate_Binary) 
+              ~  Num_Tutoring_Visits + Is_Hispanic + Gender_Binary + Lived_On_Campus + Is_Transfer, 
+              data = sdata) 
+CoxAll |> 
+  tbl_regression(exp = TRUE)
+summary(CoxAll) 
+```
+
+It was found that number of tutoring visits was significant (*p* \<
+.01), with every tutoring visit indicating a 3.06% decrease in the
+hazard of graduation. It was also found that Hispanic students hazard of
+graduating is about 17.97% lower than that of Non-Hispanic Students (*p*
+\< .05). Lastly, transfer students were found to have a increase of
+300.97% in their hazard of graduation compared to those who were not
+transfer students (*p* \< .001). Overall the model has good predictive
+ability with a concordance of 0.736 (*SE* = 0.012), and fit the data
+quite well χ²(4, N = 5617) = 206.9, *p* \< 0.001.
+
+```{r}
+# Checking the Proportional Hazards Assumption
+PHA <- cox.zph(CoxAll, global = FALSE)
+print(PHA)
+plot(PHA) 
+```
+
+Regarding our assumptions, we did not meet the proportional hazards
+assumption for all of our predictors. The predictors of transfer status
+and lived on campus status were both significant, indicating that our
+hazard ratios changed over time. This can be seen in the above charts,
+with beta values changing over time for the aforementioned predictors.
+Additionally, the assumption of censoring being non-informative was
+broken as well. This was due to the fact that graduation did have an
+impact on student's censoring with dropping out being a specific
+subgroup of interest. Regardless of assumptions, the Kaplan-Meier curve
+was included for learning.
+
+```{r}
+# All Variables Fit Graph
+survival_fit <- survfit(CoxAll)
+ggsurvplot(survival_fit, data = ddata, conf.int = TRUE, color = "#2E9FDF",
+          xlab = "Time", ylab = "Survival Probability",
+          title = "Survival Curves from Cox Proportional Hazards Model")
+
+# Gender Fit
+CoxGen <- survfit(Surv(start, stop, Did_Graduate_Binary) ~ Lived_On_Campus, data = ddata)
+summary(CoxGen)
+ggsurvplot(CoxGen, data = ddata, conf.int = TRUE, 
+            xlab = "Time", ylab = "Survival Probability",
+            title = "Survival Curves (Gender)")
+```
+
+The above Kaplan-Meier curve shows the overall survival probability for
+our sample. The curves can be interpreted with *time on the bottom, and
+the probability of survival on the left. The curves indicate small
+differences in survival time for most predictors, whereas transfer
+status shows a large difference because the curves are* far apart.
 
 ## Sample #2
 
@@ -724,16 +818,13 @@ limitations, and future directions.
 
 ## References
 
+Kleinbaum, D., & Klien, M. (2012). *Survival Analysis: A Self‐Learning
+Text*. Springer.
+
 ## Acknowledgements
 
-"Sometimes, you end up gettin' where you wanna go, And then find out
-when you get there that you don't wanna be where you're at. And then you
-feel like this is all just a waste of time. But just remember, if you
-never got there then you'd always be wanting to get there And then you
-don't know you don't wanna be there until you get there So sometimes you
-just gotta go where you don't wanna go Just to know that that's not
-whеre you wanna be Okay, have a supеr freakin' awesome d— rest of your
-day and stuff Okay, bye" - Rodney Norman
+A big thanks to Dr. Kreshenko for giving us the platform to be able to
+conduct this research. Her continued support helped us
 
 ```{r}
 #                      /^--^\     /^--^\     /^--^\
