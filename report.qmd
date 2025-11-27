@@ -24,37 +24,75 @@ knitr:
 
 # Introduction
 
-Despite ongoing efforts to increase diversity in the technology sector,
-computer science programs continue to be disproportionately represented
-by white males (citation and numbers needed). Limited minority representation within the profession
-contributes to the exclusion of diverse perspectives in product design,
-which can result in algorithmic harm --- technology-driven threats to civil
-rights and democratic values (citation needed). Understanding the factors contributing to
-under-representation in computer science is therefore critical to
-fostering equitable and inclusive technological development. To the best
-of our knowledge, no such analysis has been conducted on students
-currently attending California State University Channel Islands (CSUCI),
-a Hispanic-Serving Institution.
+## Motivation
 
-(TODO: insert lit review of previous, similar work)
+Despite calls to address the lack of racial and gender diversity in
+computing fields, white and Asian males continue to be over-represented
+among graduates from American universities' computing degree programs
+(Zahedi et al., 2021). Limited minority representation among these
+graduates reflects the documented racial and gender disparities that
+exist in the wider tech industry. In 2022, 38.9% of computing bachelor's
+degrees awarded by US higher education institutions were obtained by
+white men, and 13.6% were obtained by Asian men (Campbell, 2024). Also
+in 2022, 47.6% of the American "high tech workforce" was composed of
+white men, and 13.3% was composed of Asian men (*High Tech, Low
+Inclusion,* 2024). In contrast, 10.9% of computing bachelor's degrees
+granted by American universities in 2022 were awarded to white women,
+followed by 10.1% awarded to Hispanic/Latino men, 6.1% awarded to Asian
+women, 5.8% awarded to Black men, 3.4% awarded to Hispanic/Latino women,
+and 2.6% awarded to Black women (Campbell, 2024). Similarly, the high
+tech workforce in 2022 was composed of 12.3% white women, 7.7%
+Hispanic/Latino men, 4.8% Asian women, 5.1% Black men, 2.2%
+Hispanic/Latino women, and 2.3% Black women (*High Tech, Low Inclusion*,
+2024). These disparities have a direct impact on product design — from
+fitness trackers that do not operate on dark skin to recruitment tools
+penalizing resumes with the word "women's" and de-prioritizing graduates
+from all-female colleges (*Inclusion In Tech*, 2019). Thus,
+understanding the factors contributing to sustained minority
+under-representation among computing graduates is critical to building a
+pipeline of talent that fosters equitable and inclusive technological
+development.
 
-Thus, the current study will examine demographics among students
-enrolled in the Computer Science Program at CSUCI, while painting a
-holistic picture of the department. Additionally, factors predicting
-graduation rates among students in the program will expose problem areas
-necessary for intervention. The findings aim to help CSUCI and similar
-institutions design targeted interventions to support at-risk computer
-science students, ultimately contributing to a more diverse and
-inclusive technology workforce that better serves society as a whole.
+Minority-serving institutions — including Historically Black Colleges
+and Universities (HBCUs) and Hispanic-Serving Institutions (HSIs) — play
+a particularly important role in cultivating this pipeline of diverse
+tech talent. **\[why? because they graduate a lot of minorities (in
+tech) — find source(s)\]**. One such minority-serving institution is
+California State University Channel Islands (CSUCI), a Hispanic-Serving
+Institution located in Camarillo, California. Of the 719 undergraduate
+degrees awarded by the university's Computer Science program between
+2015 and 2025, 33.9% were obtained by Hispanic/Latino students and 27.0%
+were obtained by women (*Degrees Dashboard: Programs*, 2025). Relative
+to national statistics, CSUCI awards computing degrees to a much higher
+proportion of women and Hispanic/Latino students, emphasizing the
+importance of understanding the factors behind minority student
+graduation at CSUCI. Thus, the current study will examine demographics
+among students enrolled in the Computer Science Program at CSUCI, while
+painting a holistic picture of the department. Additionally, factors
+predicting graduation rates among students in the program will expose
+problem areas necessary for intervention. The findings aim to help CSUCI
+and similar institutions design targeted interventions to support
+at-risk computer science students, ultimately contributing to a more
+diverse and inclusive technology workforce that better serves society as
+a whole.
+
+## Literature Review
+
+## Research Questions
 
 # Methods
 
 The following sections describe the process behind acquiring, preparing,
-and analyzing the data. The @sec-data section [characterizes the original dataset](@sec-data_descr), and then explains how and why the original dataset was [cleaned](@sec-data_clean),
-[pivoted](@sec-data_pivot), and [subset](@sec-data_subset). The @sec-descr_stats section graphs key
-metrics of the [first](@sec-descr_1) and [second](@sec-descr_2) samples taken from the dataset. Finally, the @sec-stats_back
-section details the theoretical foundations and assumptions of [chi-square](@sec-cs_back), [logistic regression](@sec-lr_back), and [survival analysis](@sec-sa_back) — the three statistical methods used
-to interpret the data.
+and analyzing the data. The @sec-data section [characterizes the
+original dataset](@sec-data_descr), and then explains how and why the
+original dataset was [cleaned](@sec-data_clean),
+[pivoted](@sec-data_pivot), and [subset](@sec-data_subset). The
+@sec-descr_stats section graphs key metrics of the [first](@sec-descr_1)
+and [second](@sec-descr_2) samples taken from the dataset. Finally, the
+@sec-stats_back section details the theoretical foundations and
+assumptions of [chi-square](@sec-cs_back), [logistic
+regression](@sec-lr_back), and [survival analysis](@sec-sa_back) — the
+three statistical methods used to interpret the data.
 
 ## Data {#sec-data}
 
@@ -930,10 +968,29 @@ limitations, and future directions.
 Kleinbaum, D., & Klien, M. (2012). *Survival Analysis: A Self‐Learning
 Text*. Springer.
 
+[Multi-Institution Study of Student Demographics and Stickiness of
+Computing Majors in the
+USA](https://www.researchgate.net/publication/339337135_Multi-institution_study_of_student_demographics_and_stickiness_of_computing_majors_in_the_USA)
+
+[Inclusion in Tech: How Diversity Benefits All
+Americans](https://www.govinfo.gov/content/pkg/CHRG-116hhrg37565/pdf/CHRG-116hhrg37565.pdf)
+
+[Computing Bachelor's Degrees Awarded vs US College Age Population by
+Race/Ethnicity and Gender/Sex
+(2022)](https://cra.org/crn/2024/02/computing-bachelors-degrees-awarded-vs-us-college-age-population-by-race-ethnicity-and-gender-sex-2022/)
+
+[High Tech, Low Inclusion: Diversity in the High Tech Workforce and
+Sector
+2014-2022](https://web.archive.org/web/20240911213641/https://www.eeoc.gov/sites/default/files/2024-09/20240910_Diversity%20in%20the%20High%20Tech%20Workforce%20and%20Sector%202014-2022.pdf)
+
+[Degrees Dashboard:
+Programs](https://oneci.csuci.edu/t/IRPEGuest/views/DegreesAwarded/PROGRAMP?%3Aembed=y&%3Aiid=1&%3AisGuestRedirectFromVizportal=y)
+
 ## Acknowledgements
 
 A big thanks to Dr. Kryshchenko for giving us the platform to be able to
-conduct this research. Her continued support was much appreciated throughout the entire process.
+conduct this research. Her continued support was much appreciated
+throughout the entire process.
 
 ```{r}
 #                      /^--^\     /^--^\     /^--^\
