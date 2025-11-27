@@ -80,6 +80,21 @@ a whole.
 
 ## Research Questions
 
+The current study aims to answer the following research questions:
+
+1.  Do graduation rates in CSUCI's Computer Science Department differ
+    across key demographic, academic, and enrollment-related variables?
+
+2.  What influence do the following variables have on whether students
+    graduate from the Department of Computer Science?
+
+    -   Hispanic Identity
+    -   Gender Identity
+    -   Transfer Status
+    -   Number of Units Taken per Term
+    -   Campus Housing Status per Term
+    -   Number of Tutoring Visits per Term
+
 # Methods
 
 The following sections describe the process behind acquiring, preparing,
