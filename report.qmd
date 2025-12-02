@@ -522,6 +522,7 @@ attended. Student average unit loads were categorized into: part-time
 (11 or fewer units), full-time (12 to 17 units), and heavy course load
 (18 or more units).
 
+
 Down-sampling
 
 ## Descriptive Statistics {#sec-descr_stats}
@@ -577,7 +578,49 @@ ddata <- ddata %>%
         mutate(Terms_Attended = sum(!is.na(c_across(ends_with("_Unit_Load"))))) %>%
         ungroup()
 
+ddata$Is_Transfer <- as.character(ddata$Is_Transfer)
+
 sdata <- ddata
+```
+
+```{r}
+AverageChecker<- function (x){
+  rowMeans(x, na.rm = TRUE)
+}
+
+ddata$Units_All <- SummaryChecker(ddata[, grep("_Unit_Load$", names(ddata))])
+ddata$Housing_All <- BinaryChecker(ddata[, grep("_Lived_On_Campus$", names(ddata))])
+ddata$Tutoring_All <- SummaryChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
+ddata$AverageUnits <- AverageChecker(ddata [,grep("_Unit_Load$", names(ddata))])
+ddata$AverageTutoring <- AverageChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
+ddata$Tutoring_Binary <- BinaryChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
+
+sdata <- ddata
+
+log <- sdata %>%
+  select(Is_Hispanic, Gender_Binary, Housing_All,
+         Did_Graduate, AverageUnits, Tutoring_All)
+
+#AverageUnits Binning
+sdata$AverageUnits_bin <- cut(log$AverageUnits,
+                                breaks = c(0, 11, 15, 18),
+                                include.lowest = TRUE,
+                                labels = c("Parttime", "Fulltime", "Heavy"))
+
+#Part-time: 6-11, Medium(Full Time): 12-15, Heavy: 16-17
+table(sdata$AverageUnits_bin)# Check counts
+#High is super low :/
+
+#Medium as reference
+sdata$AverageUnits_bin <- factor(sdata$AverageUnits_bin,
+                                   levels = c("Fulltime", "Parttime", "Heavy"))
+
+#Tutoring_All binning
+sdata$Tutoring_bin <- cut(sdata$Tutoring_All,
+                            breaks = c(-1, 0, 5, 10,Inf),
+                            include.lowest = TRUE,
+                            labels = c("No Tutoring", "Low", "Moderate",
+                                       "High"))
 ```
 
 ### Sample #1 {#sec-descr_1}
@@ -649,14 +692,14 @@ ggplot(sdata, mapping = aes(x = Did_Graduate, fill = Did_Graduate)) +
       geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5) 
 
 # Tutoring Binned
-ggplot(sdata, mapping = aes(x = Tutoring_Binned, fill = Tutoring_Binned)) +
+ggplot(sdata, mapping = aes(x = Tutoring_bin, fill = Tutoring_bin)) +
       geom_bar() +
       labs(x = "Student Status (Based on Units)", y = "Number of Students") +
       scale_fill_manual(values = c("#E798A1", "#A90806", "#E798A1", "#A90806"), guide = "none") +
       geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5)   
   
 # Student Status (Units)
-ggplot(sdata, mapping = aes(x = Binned, fill = Binned)) +
+ggplot(sdata, mapping = aes(x = AverageUnits_bin, fill = AverageUnits_bin)) +
       geom_bar() +
       scale_fill_manual(values= c("#E798A1", "#A90806", "#E798A1"), guide = "none") + 
       labs(x = "Student Status (Based off Units)", y = "Density",) + 
@@ -1035,6 +1078,8 @@ with the covariates of number of tutoring visits, Hispanic status,
 gender, lived on campus, and transfer status.
 
 ```{r}
+#| eval: false
+#| include: false
 # Cox Proportional Hazards Model w/All Variables 
 CoxAll <- coxph(Surv(time = start, time2 = stop, event = Did_Graduate_Binary) 
               ~  Num_Tutoring_Visits + Is_Hispanic + Gender_Binary + Lived_On_Campus + Is_Transfer, 
@@ -1055,6 +1100,8 @@ ability with a concordance of 0.736 (*SE* = 0.012), and fit the data
 quite well χ²(4, N = 5617) = 206.9, *p* \< 0.001.
 
 ```{r}
+#| eval: false
+#| include: false
 # Checking the Proportional Hazards Assumption
 PHA <- cox.zph(CoxAll, global = FALSE)
 print(PHA)
@@ -1073,6 +1120,8 @@ subgroup of interest. Regardless of assumptions, the Kaplan-Meier curve
 was included for learning.
 
 ```{r}
+#| eval: false
+#| include: false
 # All Variables Fit Graph
 survival_fit <- survfit(CoxAll)
 ggsurvplot(survival_fit, data = ddata, conf.int = TRUE, color = "#2E9FDF",
