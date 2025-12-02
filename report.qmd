@@ -80,7 +80,20 @@ a whole.
 
 There has been much prior work examining the factors behind minority
 graduation in computer science and technology-related degrees in the
-United States.  
+United States.
+
+Articles to analyze:
+
+- [Exploration of Intersectionality and Computer Science Demographics](https://dl-acm-org.ezproxy.csuci.edu/doi/abs/10.1145/3445985)
+- [Multi-Institution Study of Student Demographics and Outcomes in EE/CE](https://ieeexplore-ieee-org.ezproxy.csuci.edu/document/6881755)
+- [Does Latinx Representation Matter for Latinx Student Retention in STEM?](https://journals-sagepub-com.ezproxy.csuci.edu/doi/full/10.1177/1538192718820532)
+- [Pathways of opportunity in STEM](https://www.proquest.com/docview/2830500411?accountid=7284&pq-origsite=primo&sourcetype=Scholarly%20Journals)
+- [Kinks in the STEM Pipeline](https://onlinelibrary-wiley-com.ezproxy.csuci.edu/doi/full/10.1111/ssm.12195?sid=vendor%3Adatabase)
+- [Navigating the Path to Persistence and Belonging](https://www.proquest.com/docview/3216947411?accountid=7284&parentSessionId=Hns4Y0dLPkO39%2BJg9MPXCqguu%2BT3eH0WSNhprh2nZa4%3D&pq-origsite=primo&sourcetype=Scholarly%20Journals)
+- [Application of logistic regression to predict the failure of students in subjects of a mathematics undergraduate course](https://go-gale-com.ezproxy.csuci.edu/ps/i.do?p=AONE&u=csuci&id=GALE%7CA727953830&v=2.1&it=r&aty=ip)
+- [Factors influencing university drop-out rates](https://www-sciencedirect-com.ezproxy.csuci.edu/science/article/pii/S0360131509000815)
+- [A comparison of artificial neural networks and the statistical methods in predicting MBA student's academic performance](https://www.proquest.com/docview/2571493278?accountid=7284&parentSessionId=TZbp4nzWFQxMHrqm%2F7aw79k75g3YIGz6Je8SlhO6OYU%3D&pq-origsite=primo&sourcetype=Scholarly%20Journals)
+- [Bayesian survival modelling of university outcomes](https://research-ebsco-com.ezproxy.csuci.edu/c/ppuxpx/viewer/pdf/xm3q3sjrxr?route=details)
 
 ## Research Questions
 
