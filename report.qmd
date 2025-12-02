@@ -84,16 +84,28 @@ United States.
 
 Articles to analyze:
 
-- [Exploration of Intersectionality and Computer Science Demographics](https://dl-acm-org.ezproxy.csuci.edu/doi/abs/10.1145/3445985)
-- [Multi-Institution Study of Student Demographics and Outcomes in EE/CE](https://ieeexplore-ieee-org.ezproxy.csuci.edu/document/6881755)
-- [Does Latinx Representation Matter for Latinx Student Retention in STEM?](https://journals-sagepub-com.ezproxy.csuci.edu/doi/full/10.1177/1538192718820532)
-- [Pathways of opportunity in STEM](https://www.proquest.com/docview/2830500411?accountid=7284&pq-origsite=primo&sourcetype=Scholarly%20Journals)
-- [Kinks in the STEM Pipeline](https://onlinelibrary-wiley-com.ezproxy.csuci.edu/doi/full/10.1111/ssm.12195?sid=vendor%3Adatabase)
-- [Navigating the Path to Persistence and Belonging](https://www.proquest.com/docview/3216947411?accountid=7284&parentSessionId=Hns4Y0dLPkO39%2BJg9MPXCqguu%2BT3eH0WSNhprh2nZa4%3D&pq-origsite=primo&sourcetype=Scholarly%20Journals)
-- [Application of logistic regression to predict the failure of students in subjects of a mathematics undergraduate course](https://go-gale-com.ezproxy.csuci.edu/ps/i.do?p=AONE&u=csuci&id=GALE%7CA727953830&v=2.1&it=r&aty=ip)
-- [Factors influencing university drop-out rates](https://www-sciencedirect-com.ezproxy.csuci.edu/science/article/pii/S0360131509000815)
-- [A comparison of artificial neural networks and the statistical methods in predicting MBA student's academic performance](https://www.proquest.com/docview/2571493278?accountid=7284&parentSessionId=TZbp4nzWFQxMHrqm%2F7aw79k75g3YIGz6Je8SlhO6OYU%3D&pq-origsite=primo&sourcetype=Scholarly%20Journals)
-- [Bayesian survival modelling of university outcomes](https://research-ebsco-com.ezproxy.csuci.edu/c/ppuxpx/viewer/pdf/xm3q3sjrxr?route=details)
+-   [Exploration of Intersectionality and Computer Science
+    Demographics](https://dl-acm-org.ezproxy.csuci.edu/doi/abs/10.1145/3445985)
+-   [Multi-Institution Study of Student Demographics and Outcomes in
+    EE/CE](https://ieeexplore-ieee-org.ezproxy.csuci.edu/document/6881755)
+-   [Does Latinx Representation Matter for Latinx Student Retention in
+    STEM?](https://journals-sagepub-com.ezproxy.csuci.edu/doi/full/10.1177/1538192718820532)
+-   [Pathways of opportunity in
+    STEM](https://www.proquest.com/docview/2830500411?accountid=7284&pq-origsite=primo&sourcetype=Scholarly%20Journals)
+-   [Kinks in the STEM
+    Pipeline](https://onlinelibrary-wiley-com.ezproxy.csuci.edu/doi/full/10.1111/ssm.12195?sid=vendor%3Adatabase)
+-   [Navigating the Path to Persistence and
+    Belonging](https://www.proquest.com/docview/3216947411?accountid=7284&parentSessionId=Hns4Y0dLPkO39%2BJg9MPXCqguu%2BT3eH0WSNhprh2nZa4%3D&pq-origsite=primo&sourcetype=Scholarly%20Journals)
+-   [Application of logistic regression to predict the failure of
+    students in subjects of a mathematics undergraduate
+    course](https://go-gale-com.ezproxy.csuci.edu/ps/i.do?p=AONE&u=csuci&id=GALE%7CA727953830&v=2.1&it=r&aty=ip)
+-   [Factors influencing university drop-out
+    rates](https://www-sciencedirect-com.ezproxy.csuci.edu/science/article/pii/S0360131509000815)
+-   [A comparison of artificial neural networks and the statistical
+    methods in predicting MBA student's academic
+    performance](https://www.proquest.com/docview/2571493278?accountid=7284&parentSessionId=TZbp4nzWFQxMHrqm%2F7aw79k75g3YIGz6Je8SlhO6OYU%3D&pq-origsite=primo&sourcetype=Scholarly%20Journals)
+-   [Bayesian survival modelling of university
+    outcomes](https://research-ebsco-com.ezproxy.csuci.edu/c/ppuxpx/viewer/pdf/xm3q3sjrxr?route=details)
 
 ## Research Questions
 
@@ -668,8 +680,8 @@ As mentioned in @sec-methods, the following sections within Statistical
 Analyses describe the statistical methods implemented in this study:
 [Chi-square](@sec-cs_back), [logistic regression](@sec-lr_back), and the
 [Cox Proportional Hazards model](@sec-sa_back). Each description for a
-given statistical analysis method contains an explanation of the theory and
-assumptions for that method.
+given statistical analysis method contains an explanation of the theory
+and assumptions for that method.
 
 ### Chi-Square {#sec-cs_back}
 
@@ -986,6 +998,30 @@ counterparts.s
 ```
 
 ### Logistic Regression
+
+A logistic regression analysis was conducted to determine whether
+Hispanic identity, gender, transfer status, tutoring visits, enrollment
+status, and housing predicted graduation. Variance inflation factor
+(VIF) values ranged from 1.01 to 1.35, indicating no multicollinearity
+among the predictors. The overall model significantly improved
+prediction over the null model, X²(9) = 259.70, p \< .001. The model
+accounted for 21.4% (Cox and Snell R² = .214) to 28.5% (Nigelkerke R² =
+.285) of the variance in graduation, with 69.91% classification
+accuracy.
+
+Hispanic identity, transfer status, housing, part-time status, and
+tutoring significantly predicted graduation. Hispanic students had 0.74
+lower odds of graduating compared to non-Hispanic students. Part-time
+students had 0.44 lower odds of graduating than full-time students, and
+living in campus housing had 0.69 lower odds of graduating. Transfer
+students had 4.82 times higher odds of graduating than non-transfer
+students, and compared to students who received no tutoring, those with
+1–5 tutoring sessions had 2.87 times higher odds of graduating, those
+with 6–10 sessions had 4.99 times higher odds, and those with 11 or more
+sessions had 8.07 times higher odds.
+
+```{r}
+```
 
 ### Survival Analysis
 
