@@ -56,8 +56,8 @@ development.
 Minority-serving institutions — including Historically Black Colleges
 and Universities (HBCUs) and Hispanic-Serving Institutions (HSIs) — play
 a particularly important role in cultivating this pipeline of diverse
-tech talent. **\[why? because they graduate a lot of minorities (in
-tech) — find source(s)\]**. One such minority-serving institution is
+tech talent, because they graduate a substantial number of minorities in
+tech ("HBCUs and HSIs", 2014). One such minority-serving institution is
 California State University Channel Islands (CSUCI), a Hispanic-Serving
 Institution located in Camarillo, California. Of the 719 undergraduate
 degrees awarded by the university's Computer Science program between
@@ -78,6 +78,10 @@ a whole.
 
 ## Literature Review
 
+There has been much prior work examining the factors behind minority
+graduation in computer science and technology-related degrees in the
+United States.  
+
 ## Research Questions
 
 The current study aims to answer the following research questions:
@@ -88,14 +92,16 @@ The current study aims to answer the following research questions:
 2.  What influence do the following variables have on whether students
     graduate from the Department of Computer Science?
 
-    -   Hispanic Identity
-    -   Gender Identity
-    -   Transfer Status
-    -   Number of Units Taken per Term
-    -   Campus Housing Status per Term
-    -   Number of Tutoring Visits per Term
+The variables being analyzed in this study are:
 
-# Methods
+-   Hispanic Identity
+-   Gender Identity
+-   Transfer Status
+-   Number of Units Taken per Term
+-   Campus Housing Status per Term
+-   Number of Tutoring Visits per Term
+
+# Methods {#sec-methods}
 
 The following sections describe the process behind acquiring, preparing,
 and analyzing the data. The @sec-data section [characterizes the
@@ -480,12 +486,18 @@ for (current_row in 1:nrow(cleaned_and_reordered)) {
 
 ### Data Subsetting {#sec-data_subset}
 
-Binning, Down-sampling
+For several analyses, continuous data were converted into categorical
+groups. The total number of tutoring visits — `Tutoring_All` —
+represented the cumulative number of sessions a student attended across
+all terms enrolled. This variable was categorized into four groups: no
+tutoring, low tutoring (1 to 5 visits), moderate tutoring (6 to 10
+visits), and high tutoring (11 or more visits). The `AverageUnits`
+variable reflected the average number of units enrolled across the terms
+attended. Student average unit loads were categorized into: part-time
+(11 or fewer units), full-time (12 to 17 units), and heavy course load
+(18 or more units).
 
-`Tutoring_All` was created by summing up the total number of tutoring
-visits the student attended across the number of terms they were
-enrolled in. These numbers were categorized into No tutoring, low (1 to
-5 visits), moderate (6 to 10) and high (over 11 visits).
+Down-sampling
 
 ## Descriptive Statistics {#sec-descr_stats}
 
@@ -557,8 +569,18 @@ In regards to students' class taking habits, the average units taken per
 term was 11.42 while students stayed an average of 5.23 terms (*SD* =
 3.11). Within the department, 73.9% majored in Computer Science, 16.7%
 majored in Information Technology, and the remaining 4% majored in
-Mechatronics Engineering. Now that we have a better understanding of our
-sample, we will explain the background of our statistical analyses.
+Mechatronics Engineering.
+
+In regards to students' graduation rates, \[percentage\] (*n* =
+\[number\]) graduated with a Bachelor's degree from the Department of
+Computer Science (i.e. either "B.S. Computer Science," "B.S. Information
+Technology," or "B.S. Mechatronics Engineering"), \[percentage\] (*n* =
+\[number\]) graduated with Bachelor's degree from outside of the
+Department of Computer Science, and \[percentage\] (*n* = \[number\])
+did not graduate.
+
+Now that we have a better understanding of our sample, we will explain
+the background of our statistical analyses.
 
 ```{r}
 #| column: screen-inset-shaded
@@ -629,17 +651,80 @@ ggplot(sdata, mapping = aes(x = Units_All)) +
 
 # Statistical Analyses {#sec-stats_back}
 
+As mentioned in @sec-methods, the following sections within Statistical
+Analyses describe the statistical methods implemented in this study:
+[Chi-square](@sec-cs_back), [logistic regression](@sec-lr_back), and the
+[Cox Proportional Hazards model](@sec-sa_back). Each description for a
+given statistical analysis method contains an explanation of the theory and
+assumptions for that method.
+
 ### Chi-Square {#sec-cs_back}
+
+The Chi-square test of independence was used to investigate group
+differences between categorical variables. This non-parametric statistic
+is appropriate when variables are measured at nominal levels (e.g.
+Hispanic identity, transfer status, graduation, etc.) and when group
+sample sizes are unequal (McHugh, 2013). The test evaluates whether the
+observed counts in a contingency table differ from the expected
+frequencies and determines whether an association exists between the two
+categorical variables. For example, it can test whether graduation rates
+differ between Hispanic and non-Hispanic students.
 
 #### Theory
 
+The Chi-square formula is as follows:
+
+$$
+\sum_{i=1,j=0}^{n}\chi_{i-j}^2 = \frac{(O-E)^2}{E}
+$$
+
+where $O$ represents the observed counts, $E$ represents the expected
+counts, and $\chi_{i-j}^2$ represents the Chi-square value for each
+cell, summed across all cells in the contingency table.
+
 #### Assumptions
+
+The assumptions of the Chi-square test are that each cell contains
+frequencies or counts rather than percentages, that each participant
+contributes to only one cell of the contingency table, and that expected
+cell frequencies are below 5 for a 2 x 2 table or greater than 1 with no
+more than 20% of counts below 5 for a larger table (McHugh, 2013).
 
 ### Logistic Regression {#sec-lr_back}
 
+The binary logistic regression model was used to predict graduation.
+This method allows for categorical and continuous variables, and models
+the log-odds of a binary outcome (e.g., graduated vs. did not graduate).
+The coefficients can be exponentiated to obtain odds ratios, which
+indicate how changes in predictors affect the odds of graduation (Field,
+2024).
+
 #### Theory
 
+The logistic regression equation is as follows:
+
+$$
+\log(\frac{p(X)}{1-p(X)}) = \beta_0 + \beta_1X_1 + \dots + \beta_pX_p
+$$
+
+where $\beta_0$ represents the baseline log-odds of graduation when all
+predictors are equal to zero, and $\beta_1 \dots \beta_p$ represent the
+change in log-odds associated with a one-unit increase in each
+corresponding predictor. The parameters of a logistic regression model
+are calculated using Maximum Likelihood Estimation, which identifies
+values of $\beta_0, \beta_1 \dots \beta_p$ that make the predicted
+probability of each observation align as closely as possible with the
+binary outcome.
+
 #### Assumptions
+
+Before conducting logistic regression, several assumptions must be met.
+First, each observation must be independent, meaning no repeated
+measures or correlated outcomes are present. Second, there must be a
+linear relationship between each continuous variable and the
+logit-transformed outcome. Third, the predictor variables should not be
+highly correlated with each other. Finally, the model should not include
+strongly influential outliers (Stoltzfus, 2011).
 
 ### Survival Analysis {#sec-sa_back}
 
@@ -664,18 +749,18 @@ as a variable. Additionally, allows statisticians to account for
 time-varying predictor variables, not just variables measured at the
 beginning of a study. Its formula is as follows:
 
-$h(t|\mathbf{X}) = h_0(t)\overset{\sum_{}X\mathrm{}_{i}\boldsymbol{\beta}\mathrm{}_{i}}{\mathrm{e}^{i = 1}}$
+$$
+h(t|X) = h_0(t)\cdot e^{\sum_{i=1}^{p}\beta_iX_i}
+$$
 
-The $h(t|\mathbf{X})$ portion of the equation refers to hazard rate at a
-certain time for individuals, meaning their likelihood of the outcome of
+The $h(t|X)$ portion of the equation refers to hazard rate at a certain
+time for individuals, meaning their likelihood of the outcome of
 interest. $h_0(t)$ refers to the baseline hazard rate at a given time,
-with
-$\overset{\sum_{}X\mathrm{}_{i}\boldsymbol{\beta}\mathrm{}_{i}}{\mathrm{e}^{i = 1}}$
-being a linear combination of each covariate (predictor variable) along
-with their coefficient (${\beta}\mathrm{}_{i}$). The coefficient tells
-us the change in log-hazard ratio for a one unit change in the covariate
-($X\mathrm{}_{i}$). Now that we understand the formula, the assumptions
-will be examined.
+with $e^{\sum_{i=1}^{p}\beta_iX_i}$ being a linear combination of each
+covariate (predictor variable) along with their coefficient ($\beta_i$).
+The coefficient tells us the change in log-hazard ratio for a one unit
+change in the covariate ($X_i$). Now that we understand the formula, the
+assumptions will be examined.
 
 #### Assumptions
 
@@ -1000,6 +1085,9 @@ Sector
 
 [Degrees Dashboard:
 Programs](https://oneci.csuci.edu/t/IRPEGuest/views/DegreesAwarded/PROGRAMP?%3Aembed=y&%3Aiid=1&%3AisGuestRedirectFromVizportal=y)
+
+[HBCUs and HSIs: How are we Doing in Graduating
+Engineers](https://www.proquest.com/docview/1692817472?accountid=7284&parentSessionId=euZW7j6UYFQSRVu%2FEyAL09bZlz%2BUNaOawbv8VWz5uBk%3D&pq-origsite=primo&sourcetype=Conference%20Papers%20&%20Proceedings)
 
 ## Acknowledgements
 
