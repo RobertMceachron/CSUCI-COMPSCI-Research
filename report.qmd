@@ -522,11 +522,6 @@ attended. Student average unit loads were categorized into: part-time
 (11 or fewer units), full-time (12 to 17 units), and heavy course load
 (18 or more units).
 
-
-Down-sampling
-
-## Descriptive Statistics {#sec-descr_stats}
-
 ```{r}
 #| message: false
 #| warning: false
@@ -550,13 +545,19 @@ SummaryChecker <- function(x) {
               x[is.na(x)] <- 0
               as.integer(rowSums(x))
 }
+# Calculates Average values
+AverageChecker <- function (x){
+  rowMeans(x, na.rm = TRUE)
+}
+
+
 # Recodes Gender to binary 
-  ddata$Gender <- as.character(ddata$Gender)
-  ddata$Gender_Binary <- recode(ddata$Gender,
-                                "Man" = "0",
-                                "Woman" = "1",
-                                .default = "1"
-  )
+ddata$Gender <- as.character(ddata$Gender)
+ddata$Gender_Binary <- recode(ddata$Gender,
+                              "Man" = "0",
+                              "Woman" = "1",
+                              .default = "1"
+)
   
 ddata$Did_Graduate <- as.character(ddata$Did_Graduate)
 ddata$Did_Graduate <- recode(ddata$Did_Graduate,
@@ -565,12 +566,13 @@ ddata$Did_Graduate <- recode(ddata$Did_Graduate,
                             "Yes, with CS/IT/EMEC" = 1,
 )
 
-
 #Runs Binary/Summary Checker
-ddata$Did_Graduate <- BinaryChecker(ddata[, grep("_Graduate$", names(ddata))])
 ddata$Units_All <- SummaryChecker(ddata[, grep("_Unit_Load$", names(ddata))])
 ddata$Housing_All <- BinaryChecker(ddata[, grep("_Lived_On_Campus$", names(ddata))])
 ddata$Tutoring_All <- SummaryChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
+ddata$AverageUnits <- AverageChecker(ddata [,grep("_Unit_Load$", names(ddata))])
+ddata$AverageTutoring <- AverageChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
+ddata$Tutoring_Binary <- BinaryChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
 
 # Adds & Calculates Terms Attended
 ddata <- ddata %>% 
@@ -579,51 +581,88 @@ ddata <- ddata %>%
         ungroup()
 
 ddata$Is_Transfer <- as.character(ddata$Is_Transfer)
-
-sdata <- ddata
 ```
 
+Binning the Data
 ```{r}
-AverageChecker<- function (x){
-  rowMeans(x, na.rm = TRUE)
-}
-
-ddata$Units_All <- SummaryChecker(ddata[, grep("_Unit_Load$", names(ddata))])
-ddata$Housing_All <- BinaryChecker(ddata[, grep("_Lived_On_Campus$", names(ddata))])
-ddata$Tutoring_All <- SummaryChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
-ddata$AverageUnits <- AverageChecker(ddata [,grep("_Unit_Load$", names(ddata))])
-ddata$AverageTutoring <- AverageChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
-ddata$Tutoring_Binary <- BinaryChecker(ddata[, grep("_Tutoring_Visits$", names(ddata))])
-
-sdata <- ddata
-
-log <- sdata %>%
-  select(Is_Hispanic, Gender_Binary, Housing_All,
-         Did_Graduate, AverageUnits, Tutoring_All)
-
-#AverageUnits Binning
-sdata$AverageUnits_bin <- cut(log$AverageUnits,
+# AverageUnits Binning (Part-time: 6-11, Medium(Full Time): 12-15, Heavy: 16-17)
+ddata$AverageUnits_bin <- cut(ddata$AverageUnits,
                                 breaks = c(0, 11, 15, 18),
                                 include.lowest = TRUE,
                                 labels = c("Parttime", "Fulltime", "Heavy"))
 
-#Part-time: 6-11, Medium(Full Time): 12-15, Heavy: 16-17
-table(sdata$AverageUnits_bin)# Check counts
-#High is super low :/
-
-#Medium as reference
-sdata$AverageUnits_bin <- factor(sdata$AverageUnits_bin,
+# Medium as reference
+ddata$AverageUnits_bin <- factor(ddata$AverageUnits_bin,
                                    levels = c("Fulltime", "Parttime", "Heavy"))
 
-#Tutoring_All binning
-sdata$Tutoring_bin <- cut(sdata$Tutoring_All,
-                            breaks = c(-1, 0, 5, 10,Inf),
-                            include.lowest = TRUE,
-                            labels = c("No Tutoring", "Low", "Moderate",
-                                       "High"))
+# Tutoring_All binning
+ddata$Tutoring_bin <- cut(ddata$Tutoring_All,
+                          breaks = c(-1, 0, 5, 10,Inf),
+                          include.lowest = TRUE,
+                          labels = c("No Tutoring", "Low", "Moderate", "High"))
+
 ```
 
+```{r}
+# Recode Variables to Factors
+ddata$Is_Hispanic <- factor(ddata$Is_Hispanic,
+                            levels = c(0,1),
+                            labels = c("Non Hispanic", "Hispanic"))
+
+ddata$Gender_Binary <- factor(ddata$Gender_Binary,
+                              levels = c(0,1),
+                              labels = c("Male", "Female"))
+
+ddata$Did_Graduate <- factor(ddata$Did_Graduate,
+                                    levels = c(0, 1),
+                                    labels = c("Did Not Graduate", "Graduated"))
+
+ddata$Is_Transfer <- factor(ddata$Is_Transfer,
+                            levels = c(0,1),
+                            labels = c("Non Transfer", "Transfer"))
+
+ddata$Housing_All <- factor(ddata$Housing_All,
+                            levels = c(0,1),
+                            labels = c("Non Housing", "Housing"))
+
+ddata$Tutoring_Binary <- factor(ddata$Tutoring_Binary,
+                            levels = c(0,1),
+                            labels = c("No Tutoring", "Yes Tutoring"))
+
+# Saves Binned/Binarized Data
+bdata <- ddata
+```
+
+Down-sampling
+
+## Descriptive Statistics {#sec-descr_stats}
+
 ### Sample #1 {#sec-descr_1}
+```{r}
+#| include: false
+sdata <- bdata
+# Overall Sample Number
+nrow(sdata)
+
+# Gender Makeup 
+nrow(sdata[sdata$Gender_Binary == "Female", ])
+nrow(sdata[sdata$Gender_Binary == "Male", ])
+
+# Hispanic Makeup
+nrow(sdata[sdata$Is_Hispanic == "Hispanic", ])
+nrow(sdata[sdata$Is_Hispanic == "Non Hispanic", ])
+
+# Transfer Makeup
+nrow(sdata[sdata$Is_Transfer == "Transfer", ])
+nrow(sdata[sdata$Is_Transfer == "Non Transfer", ])
+
+# Averages
+summary(sdata$AverageUnits)
+summary(sdata$Terms_Attended)
+
+# Major Rates
+table(sdata$major1_Descr)
+```
 
 Descriptive analyses were conducted to summarize the characteristics of
 those in the first sample. Our sample included a total of 1,091
@@ -640,7 +679,7 @@ majored in Information Technology, and the remaining 4% majored in
 Mechatronics Engineering.
 
 In regards to students' graduation rates, \[percentage\] (*n* =
-\[number\]) graduated with a Bachelor's degree from the Department of
+\[1\]) graduated with a Bachelor's degree from the Department of
 Computer Science (i.e. either "B.S. Computer Science," "B.S. Information
 Technology," or "B.S. Mechatronics Engineering"), \[percentage\] (*n* =
 \[number\]) graduated with Bachelor's degree from outside of the
@@ -651,8 +690,9 @@ Now that we have a better understanding of our sample, we will explain
 the background of our statistical analyses.
 
 ```{r}
+#| echo: false
 #| column: screen-inset-shaded
-#| layout-nrow: 1
+#| layout-nrow: 2
 # Gender Plot
 ggplot(sdata, mapping = aes(x = fct_infreq(Gender_Binary), fill = Gender_Binary)) + 
       geom_bar() +
@@ -716,6 +756,9 @@ ggplot(sdata, mapping = aes(x = Units_All)) +
 ```
 
 ### Sample #2 {#sec-descr_2}
+
+The sample consisted of 599 students, with 85.3% (n = 511) graduating with a major within the computer science department and 14.7% (n = 88) graduating with another major from a different department. Among the students, 84.8%  (n = 508) were males and 15.1% (n = 91) were females. Hispanic students made up 35.7% (n = 214) of the sample, while 64.7%  (n = 385) identified as non-Hispanic. There were 62.9% (n = 377) transfer students, and 71.1% (n = 426) were commuters. Full-time students made up 62.9% (n = 185), whereas 30.9% (n = 185) were part-time and 6.9% (n = 41) had heavy unit loads. 35.7% (n = 154)  of the students had no tutoring sessions, 33.6% (n = 201) used tutoring 1 to 5 times, 13.4% (n = 80) attended 6 to 10 sessions, and 27.4% (n = 164) attended tutoring 11 or more times.
+
 
 # Statistical Analyses {#sec-stats_back}
 
@@ -891,7 +934,7 @@ compared to males, and more females did not graduate compared to males
 
 ```{r}
 #| echo: true
-t.test(mdata$Did_Graduate, fdata$Did_Graduate, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
+#t.test(mdata$Did_Graduate, fdata$Did_Graduate, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
 chi_gender_grad <- table(ddata$Gender_Binary, ddata$Did_Graduate)
 chi_gender_grad_result <- chisq.test(chi_gender_grad)
 ```
