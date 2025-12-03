@@ -80,32 +80,7 @@ a whole.
 
 There has been much prior work examining the factors behind minority
 graduation in computer science and technology-related degrees in the
-United States.
-
-Articles to analyze:
-
--   [Exploration of Intersectionality and Computer Science
-    Demographics](https://dl-acm-org.ezproxy.csuci.edu/doi/abs/10.1145/3445985)
--   [Multi-Institution Study of Student Demographics and Outcomes in
-    EE/CE](https://ieeexplore-ieee-org.ezproxy.csuci.edu/document/6881755)
--   [Does Latinx Representation Matter for Latinx Student Retention in
-    STEM?](https://journals-sagepub-com.ezproxy.csuci.edu/doi/full/10.1177/1538192718820532)
--   [Pathways of opportunity in
-    STEM](https://www.proquest.com/docview/2830500411?accountid=7284&pq-origsite=primo&sourcetype=Scholarly%20Journals)
--   [Kinks in the STEM
-    Pipeline](https://onlinelibrary-wiley-com.ezproxy.csuci.edu/doi/full/10.1111/ssm.12195?sid=vendor%3Adatabase)
--   [Navigating the Path to Persistence and
-    Belonging](https://www.proquest.com/docview/3216947411?accountid=7284&parentSessionId=Hns4Y0dLPkO39%2BJg9MPXCqguu%2BT3eH0WSNhprh2nZa4%3D&pq-origsite=primo&sourcetype=Scholarly%20Journals)
--   [Application of logistic regression to predict the failure of
-    students in subjects of a mathematics undergraduate
-    course](https://go-gale-com.ezproxy.csuci.edu/ps/i.do?p=AONE&u=csuci&id=GALE%7CA727953830&v=2.1&it=r&aty=ip)
--   [Factors influencing university drop-out
-    rates](https://www-sciencedirect-com.ezproxy.csuci.edu/science/article/pii/S0360131509000815)
--   [A comparison of artificial neural networks and the statistical
-    methods in predicting MBA student's academic
-    performance](https://www.proquest.com/docview/2571493278?accountid=7284&parentSessionId=TZbp4nzWFQxMHrqm%2F7aw79k75g3YIGz6Je8SlhO6OYU%3D&pq-origsite=primo&sourcetype=Scholarly%20Journals)
--   [Bayesian survival modelling of university
-    outcomes](https://research-ebsco-com.ezproxy.csuci.edu/c/ppuxpx/viewer/pdf/xm3q3sjrxr?route=details)
+United States.  [Lunn et al.](https://dl-acm-org.ezproxy.csuci.edu/doi/abs/10.1145/3445985) analyzed enrollment and graduation rates for different intersectional demographics of college students in computing degrees from the MIDFIELD database. Combined with historical context analysis, the goal of the study was to analyze trends in computing degree enrollment and graduation from 1987 to 2018.
 
 ## Research Questions
 
@@ -581,6 +556,7 @@ ddata$Is_Transfer <- as.character(ddata$Is_Transfer)
 ```
 
 Binning the Data
+
 ```{r}
 # AverageUnits Binning (Part-time: 6-11, Medium(Full Time): 12-15, Heavy: 16-17)
 ddata$AverageUnits_bin <- cut(ddata$AverageUnits,
@@ -643,6 +619,7 @@ Down-sampling
 ## Descriptive Statistics {#sec-descr_stats}
 
 ### Sample #1 {#sec-descr_1}
+
 ```{r}
 #| include: false
 sdata <- s1data
@@ -685,11 +662,10 @@ term was 11.42 while students stayed an average of 5.23 terms (*SD* =
 majored in Information Technology, and the remaining 4% majored in
 Mechatronics Engineering.
 
-In regards to students' graduation rates, 53.16% (*n* =
-580) graduated with a Bachelor's degree from the Department of
-Computer Science (i.e. either "B.S. Computer Science," "B.S. Information
-Technology," or "B.S. Mechatronics Engineering"), and 46.84% (*n* = 511)
-did not graduate.
+In regards to students' graduation rates, 53.16% (*n* = 580) graduated
+with a Bachelor's degree from the Department of Computer Science (i.e.
+either "B.S. Computer Science," "B.S. Information Technology," or "B.S.
+Mechatronics Engineering"), and 46.84% (*n* = 511) did not graduate.
 
 Now that we have a better understanding of our sample, we will explain
 the background of our statistical analyses.
@@ -761,6 +737,7 @@ ggplot(sdata, mapping = aes(x = Units_All)) +
 ```
 
 ### Sample #2 {#sec-descr_2}
+
 ```{r}
 #| include: false
 sdata <- s2data
@@ -789,8 +766,18 @@ nrow(sdata[sdata$Did_Graduate == "Graduated", ])
 
 ```
 
-The sample consisted of 599 students, with 85.3% (n = 511) graduating with a major within the computer science department and 14.7% (n = 88) graduating with another major from a different department. Among the students, 84.8%  (n = 508) were males and 15.1% (n = 91) were females. Hispanic students made up 35.7% (n = 214) of the sample, while 64.7%  (n = 385) identified as non-Hispanic. There were 62.9% (n = 377) transfer students, and 71.1% (n = 426) were commuters. Full-time students made up 62.9% (n = 185), whereas 30.9% (n = 185) were part-time and 6.9% (n = 41) had heavy unit loads. 35.7% (n = 154)  of the students had no tutoring sessions, 33.6% (n = 201) used tutoring 1 to 5 times, 13.4% (n = 80) attended 6 to 10 sessions, and 27.4% (n = 164) attended tutoring 11 or more times.
-
+The sample consisted of 599 students, with 85.3% (n = 511) graduating
+with a major within the computer science department and 14.7% (n = 88)
+graduating with another major from a different department. Among the
+students, 84.8% (n = 508) were males and 15.1% (n = 91) were females.
+Hispanic students made up 35.7% (n = 214) of the sample, while 64.7% (n
+= 385) identified as non-Hispanic. There were 62.9% (n = 377) transfer
+students, and 71.1% (n = 426) were commuters. Full-time students made up
+62.9% (n = 185), whereas 30.9% (n = 185) were part-time and 6.9% (n =
+41) had heavy unit loads. 35.7% (n = 154) of the students had no
+tutoring sessions, 33.6% (n = 201) used tutoring 1 to 5 times, 13.4% (n
+= 80) attended 6 to 10 sessions, and 27.4% (n = 164) attended tutoring
+11 or more times.
 
 # Statistical Analyses {#sec-stats_back}
 
@@ -1230,8 +1217,20 @@ status shows a large difference because the curves are* far apart.
 
 ### Logistic Regression
 
-Hispanic identity, gender, transfer status, tutoring visits, enrollment status, and housing were used to predict graduation. The variance inflation factor (VIF) values ranged from 1.02 - 1.13, indicating no multicollinearity. The overall model significantly improved prediction over the null model,  X² (9) = 473.279, p < .001, with an overall classification accuracy of 85.14%. The model accounted for 11.5% (Cox and Snell R² = .115) to 20.3% (Nigelkerke R² = .203) of the variance in graduation.
-In this sample of 599 students, tutoring and transfer status significantly predicted graduation. Compared with students who received no tutoring, students with 1–5 tutoring sessions had 1.99 times higher odds of graduating, those with 6–10 sessions had 4.63 times higher odds, and those with 11 or more sessions had 4.66 times higher odds. However, Hispanic identity, gender, enrollment status, and housing were not significant predictors of graduation. 
+Hispanic identity, gender, transfer status, tutoring visits, enrollment
+status, and housing were used to predict graduation. The variance
+inflation factor (VIF) values ranged from 1.02 - 1.13, indicating no
+multicollinearity. The overall model significantly improved prediction
+over the null model, X² (9) = 473.279, p \< .001, with an overall
+classification accuracy of 85.14%. The model accounted for 11.5% (Cox
+and Snell R² = .115) to 20.3% (Nigelkerke R² = .203) of the variance in
+graduation. In this sample of 599 students, tutoring and transfer status
+significantly predicted graduation. Compared with students who received
+no tutoring, students with 1–5 tutoring sessions had 1.99 times higher
+odds of graduating, those with 6–10 sessions had 4.63 times higher odds,
+and those with 11 or more sessions had 4.66 times higher odds. However,
+Hispanic identity, gender, enrollment status, and housing were not
+significant predictors of graduation.
 
 # Discussion
 
