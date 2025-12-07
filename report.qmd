@@ -968,7 +968,7 @@ exploration of students' Hispanic Status was important to the research.
 Hispanic students were found to graduate 41.92% of the time, whereas
 their Non-Hispanic counterparts graduated 50% of the time. Further
 examination revealed a significant difference in graduation rate among
-the two groups, (*p* \< .01).
+the two groups, χ²(1, *n* = 1091) = 6.49, *p* \< 0.05.
 
 #### Gender and Hispanic Status
 
@@ -979,7 +979,7 @@ Non-Hispanic females graduate 49.50**%** of the time. This showcases a
 large disparity between Hispanic and Non-Hispanic students. In addition,
 there is a 11.97**%** difference in graduation rates among Hispanic
 males and females, whereas this disparity is not seen in their
-Non-Hispanic counterparts.s
+Non-Hispanic counterparts.
 
 ```{r}
 #| include: false
@@ -1025,19 +1025,71 @@ implemented to this dataset due to the assumption of non-informative
 censoring being broken. Regardless, it was left in to test the analysis
 on the dataset in the pursuit of learning.*
 
+```{r}
+#| include: false
+library(survival) 
+library(survminer)
+library(ggsurvfit)  
+library(timereg)  
+library(tidyverse)
+library(lubridate)
+library(gtsummary)
+library(tidycmprsk)
+library(labelled)
+
+recoded_graduation <- only_undergrads
+
+# Exclude all rows outside of when students were enrolled in a program under the department of computer science
+only_cs_rows <- recoded_graduation %>% 
+  group_by(major1_Descr) %>% 
+  filter(major1_Descr %in% cs_dept_majors)
+
+# Reorder columns to put static data in one area of the dataframe, and time-series in the other
+cleaned_and_reordered <- only_cs_rows %>% 
+  select(Student, Is_Hispanic, Gender, Is_Transfer, Dependent_Income_Code, First_CI_Term, First_CS_Term, major1_Descr, 
+         major2_Descr, major3_Descr, Did_Graduate, Term_Code, Unit_Load, Lived_On_Campus, Num_Tutoring_Visits)
+
+dddad <- cleaned_and_reordered
+
+
+
+sdata <- dddad
+sdata$Gender <- as.character(sdata$Gender)
+sdata$Gender_Binary <- recode(sdata$Gender,
+                              "Man" = "0",
+                              "Woman" = "1",
+                              .default = "1"
+)
+
+sdata$Did_Graduate_Binary <- ifelse(sdata$Did_Graduate == sdata$Term_Code, 1, 0)
+
+ddata <- select(sdata, Student, Is_Hispanic, Is_Transfer, Lived_On_Campus, Num_Tutoring_Visits, Gender_Binary, Did_Graduate_Binary)
+
+# Adds Start/Stop Sequences
+ddata <- ddata %>%
+  group_by(Student) %>% 
+  mutate(
+    start = seq(0, n()-1),
+    stop = seq(1, n())
+  )
+ 
+ddata$Is_Hispanic <- factor(ddata$Is_Hispanic)
+ddata$Gender_Binary <- factor(ddata$Gender_Binary)
+ddata$Did_Graduate_Binary <- factor(ddata$Did_Graduate_Binary)
+ddata$Is_Transfer <- factor(ddata$Is_Transfer)
+ddata$Lived_On_Campus <- factor(ddata$Is_Transfer)
+ddata$Num_Tutoring_Visits <- as.numeric(ddata$Num_Tutoring_Visits)  
+```
+
 The Cox Proportional Hazards model was run on the event of graduation,
 with the covariates of number of tutoring visits, Hispanic status,
 gender, lived on campus, and transfer status.
 
 ```{r}
-#| eval: false
 #| include: false
-# Cox Proportional Hazards Model w/All Variables 
 CoxAll <- coxph(Surv(time = start, time2 = stop, event = Did_Graduate_Binary) 
-              ~  Num_Tutoring_Visits + Is_Hispanic + Gender_Binary + Lived_On_Campus + Is_Transfer, 
-              data = sdata) 
-CoxAll |> 
-  tbl_regression(exp = TRUE)
+              ~  Num_Tutoring_Visits + Is_Hispanic + Gender_Binary + Lived_On_Campus + Is_Transfer,
+              data = ddata, id = Student)
 summary(CoxAll) 
 ```
 
@@ -1052,11 +1104,11 @@ ability with a concordance of 0.736 (*SE* = 0.012), and fit the data
 quite well χ²(4, N = 5617) = 206.9, *p* \< 0.001.
 
 ```{r}
-#| eval: false
-#| include: false
-# Checking the Proportional Hazards Assumption
+#| echo: false
+#| column: screen-inset-shaded
+#| layout-nrow: 1
 PHA <- cox.zph(CoxAll, global = FALSE)
-print(PHA)
+# print(PHA)
 plot(PHA) 
 ```
 
@@ -1068,31 +1120,7 @@ with beta values changing over time for the aforementioned predictors.
 Additionally, the assumption of censoring being non-informative was
 broken as well. This was due to the fact that graduation did have an
 impact on student's censoring with dropping out being a specific
-subgroup of interest. Regardless of assumptions, the Kaplan-Meier curve
-was included for learning.
-
-```{r}
-#| eval: false
-#| include: false
-# All Variables Fit Graph
-survival_fit <- survfit(CoxAll)
-ggsurvplot(survival_fit, data = ddata, conf.int = TRUE, color = "#2E9FDF",
-          xlab = "Time", ylab = "Survival Probability",
-          title = "Survival Curves from Cox Proportional Hazards Model")
-
-# Gender Fit
-CoxGen <- survfit(Surv(start, stop, Did_Graduate_Binary) ~ Lived_On_Campus, data = ddata)
-summary(CoxGen)
-ggsurvplot(CoxGen, data = ddata, conf.int = TRUE, 
-            xlab = "Time", ylab = "Survival Probability",
-            title = "Survival Curves (Gender)")
-```
-
-The above Kaplan-Meier curve shows the overall survival probability for
-our sample. The curves can be interpreted with *time on the bottom, and
-the probability of survival on the left. The curves indicate small
-differences in survival time for most predictors, whereas transfer
-status shows a large difference because the curves are* far apart.
+subgroup of interest. 
 
 ## Sample #2
 
@@ -1123,8 +1151,15 @@ significant predictors of graduation.
 
 # Discussion
 
-Results (colorful language), Possible intervention demographics,
-limitations, and future directions.
+Results
+
+Possible intervention demographics
+
+Due to the type and amount of data collected, the present research had numerous limitations. First, it was unclear why students did not graduate. Students’ reasons for dropping out were not collected, and we were subsequently unable to determine whether they transferred to another institution or simply took a break from their education. Second, the historical impact of COVID-19 could not be fully analyzed due to students who began their degree during or after this time still being enrolled. It is theorized that COVID-19 likely had a significant impact on graduation rates, and due to half of our data being collected after this historical event, it could explain a lot regarding graduation. Third, the extreme outliers in variables such as tutoring visits and unit load required binning, as these students did not represent the overall population. This likely resulted in a loss of information, which could have helped explain more of the variance in graduation. Lastly, variables such as GPA, classes taken each semester, and income level could have helped explain graduation. The variables were not included due to the sensitive nature of institutional data, but institutional researchers could further examine their effects. The limitations mentioned above limit the explanatory power and generalizability of our analyses, but future research can account for some of these variables. 
+
+Future research should compare graduation rates across departments to determine whether the significant predictors are specific to the Computer Science Department. Furthermore, examining parental and student income status could provide valuable insight into why students drop out. Statistical analyses such as Discrete-time Survival Analysis could help explain when students drop out of the program, as the Cox Proportional Hazards model run in the current research did not meet its assumptions. Lastly, Qualitative interviews could prove beneficial for identifying the stressors students have personally identified in the Computer Science Department and for validating or expanding the variables of interest. 
+
+Conclusion Paragraph 
 
 # Other
 
