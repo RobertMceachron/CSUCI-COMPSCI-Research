@@ -80,7 +80,13 @@ a whole.
 
 There has been much prior work examining the factors behind minority
 graduation in computer science and technology-related degrees in the
-United States.  [Lunn et al.](https://dl-acm-org.ezproxy.csuci.edu/doi/abs/10.1145/3445985) analyzed enrollment and graduation rates for different intersectional demographics of college students in computing degrees from the MIDFIELD database. Combined with historical context analysis, the goal of the study was to analyze trends in computing degree enrollment and graduation from 1987 to 2018.
+United States. [Lunn et
+al.](https://dl-acm-org.ezproxy.csuci.edu/doi/abs/10.1145/3445985)
+analyzed enrollment and graduation rates for different intersectional
+demographics of college students in computing degrees from the MIDFIELD
+database. Combined with historical context analysis, the goal of the
+study was to analyze trends in computing degree enrollment and
+graduation from 1987 to 2018.
 
 ## Research Questions
 
@@ -766,18 +772,18 @@ nrow(sdata[sdata$Did_Graduate == "Graduated", ])
 
 ```
 
-The sample consisted of 599 students, with 85.3% (n = 511) graduating
-with a major within the computer science department and 14.7% (n = 88)
+The sample consisted of 599 students, with 85.3% (*n* = 511) graduating
+with a major within the computer science department and 14.7% (*n* = 88)
 graduating with another major from a different department. Among the
-students, 84.8% (n = 508) were males and 15.1% (n = 91) were females.
-Hispanic students made up 35.7% (n = 214) of the sample, while 64.7% (n
-= 385) identified as non-Hispanic. There were 62.9% (n = 377) transfer
-students, and 71.1% (n = 426) were commuters. Full-time students made up
-62.9% (n = 185), whereas 30.9% (n = 185) were part-time and 6.9% (n =
-41) had heavy unit loads. 35.7% (n = 154) of the students had no
-tutoring sessions, 33.6% (n = 201) used tutoring 1 to 5 times, 13.4% (n
-= 80) attended 6 to 10 sessions, and 27.4% (n = 164) attended tutoring
-11 or more times.
+students, 84.8% (*n* = 508) were males and 15.1% (*n* = 91) were
+females. Hispanic students made up 35.7% (*n* = 214) of the sample,
+while 64.7% (n = 385) identified as non-Hispanic. There were 62.9% (*n*
+= 377) transfer students, and 71.1% (*n* = 426) were commuters.
+Full-time students made up 62.9% (*n* = 185), whereas 30.9% (*n* = 185)
+were part-time and 6.9% (*n* = 41) had heavy unit loads. 35.7% (*n* =
+154) of the students had no tutoring sessions, 33.6% (*n* = 201) used
+tutoring 1 to 5 times, 13.4% (*n* = 80) attended 6 to 10 sessions, and
+27.4% (*n* = 164) attended tutoring 11 or more times.
 
 # Statistical Analyses {#sec-stats_back}
 
@@ -858,8 +864,6 @@ strongly influential outliers (Stoltzfus, 2011).
 
 ### Survival Analysis {#sec-sa_back}
 
-#### Theory
-
 Survival Analysis is a category of statistical methods in which the
 variable being studied is measured until a certain event occurs,
 allowing for unique observations to be pulled from the data (Kleinbaum &
@@ -869,6 +873,8 @@ accounting for this group, survival analysis can have a larger sample
 size and often explain more variance in the dependent variable. As
 mentioned, there are many types of survival analyses, but the analysis
 used in our study is the Cox Proportional Hazards Model.
+
+#### Theory
 
 The Cox Proportional Hazards Model is a semiparametric test that enables
 statisticians to account for variables that affect the outcome of
@@ -915,192 +921,78 @@ dataset.
 
 ### Inferential Statistics
 
-Computer science programs have historically under-represented women and
-non-binary populations. This same relationship can be seen from the data
-from Channel Islands. Recall that due to the small sample size of
-non-binary (*n* = 1), their value was re-coded as being female.
+#### Gender
 
 ```{r}
-#| message: false
-#| warning: false
-
+#| include: false
 sdata <- s1data
 mdata <- sdata[sdata$Gender_Binary == "Male", ]
 fdata <- sdata[sdata$Gender_Binary == "Female", ]
-```
 
-It was found that both males and females stay at Channel Islands roughly
-the same amount of terms with males staying 5.11 terms and females
-staying 5.59 terms on average. A t-test determined a non-significant
-difference between the two groups (*p* \> .05).
-
-```{r}
-#| eval: false
-#| message: false
-#| warning: false
-#| paged-print: true
 mean(mdata$Terms_Attended) # Male Terms Mean
 mean(fdata$Terms_Attended) # Female Terms Mean
-t.test(mdata$Terms_Attended, fdata$Terms_Attended, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
+
+nrow(mdata[mdata$Did_Graduate == "Graduated", ]) / nrow(mdata)
+nrow(fdata[fdata$Did_Graduate == "Graduated", ]) / nrow(fdata)
+
+chi_gender_grad <- table(sdata$Gender_Binary, sdata$Did_Graduate)
+chisq.test(chi_gender_grad)
 ```
 
-Graduation rates were found to be non-significantly different (*p* \>
-.05), with males graduating 44.76% of the time and females 42.24% of the
-time across all terms.
-
-There is a significant association between gender and the likelihood of
-graduating (*p* \< .01), with fewer females graduating (n = 339)
-compared to males, and more females did not graduate compared to males
-(n = 1577).
-
-```{r}
-#| echo: true
-#t.test(mdata$Did_Graduate, fdata$Did_Graduate, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
-chi_gender_grad <- table(ddata$Gender_Binary, ddata$Did_Graduate)
-chi_gender_grad_result <- chisq.test(chi_gender_grad)
-```
+Computer science programs have historically under-represented women and
+non-binary populations. This same relationship can be seen from the data
+from Channel Islands. Recall that due to the small sample size of
+non-binary (*n* = 1), their value was re-coded as being female. It was
+found that both males and females stay at Channel Islands roughly the
+same amount of terms with males staying 5.23 terms and females staying
+5.17 terms on average. Graduation rates were found to be
+non-significantly different (*p* \> .05), with males graduating 47.67%
+of the time and females 42.35% of the time across all terms.
 
 #### Hispanic Status
 
+```{r}
+#| include: false
+nhisdata <- sdata[sdata$Is_Hispanic == "Non Hispanic", ]
+hisdata <- sdata[sdata$Is_Hispanic == "Hispanic", ]
+
+nrow(nhisdata[nhisdata$Did_Graduate == "Graduated", ]) / nrow(nhisdata)
+nrow(hisdata[hisdata$Did_Graduate == "Graduated", ]) / nrow(hisdata)
+
+chi_his_grad <- table(sdata$Is_Hispanic, sdata$Did_Graduate)
+chisq.test(chi_his_grad)
+```
+
 Due to Channel Islands being a Hispanic Serving Institution (HSI),
-exploration of students' Hispanic Status was important to the
-researchers. The following chart showcases the makeup of Hispanic and
-Non-Hispanic students in the Computer Science Department.
-
-```{r}
-#| message: false
-#| warning: false
-nhisdata <- ddata[ddata$Is_Hispanic == 0, ]
-hisdata <- ddata[ddata$Is_Hispanic == 1, ]
-```
-
-Students from both identity statuses attended same amount of terms
-(*Winter, Fall, Spring, Summer*) with non-Hispanic students attending a
-mean of 5.638 terms and Hispanic students 5.370. A two sided t-test
-determined no significant difference between the two groups (*p* \>
-.05).
-
-```{r}
-#| eval: false
-mean(nhisdata$Terms_Attended) # Non-Hispanic Terms Mean
-mean(hisdata$Terms_Attended) # Hispanic Terms Mean
-t.test(hisdata$Terms_Attended, nhisdata$Terms_Attended, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
-```
-
-Hispanic students were found to graduate 37.5% of the time, whereas
-their Non-Hispanic counterparts graduated 49.3% of the time. Further
+exploration of students' Hispanic Status was important to the research.
+Hispanic students were found to graduate 41.92% of the time, whereas
+their Non-Hispanic counterparts graduated 50% of the time. Further
 examination revealed a significant difference in graduation rate among
-the two groups, *t*(1449)= 4.73, *p* \< .001.
-
-```{r}
-#| eval: false    
-summary(nhisdata$Did_Graduate) # Non-Hispanic Graduation Mean
-summary(hisdata$Did_Graduate) # Hispanic Graduation Mean
-t.test(nhisdata$Did_Graduate, hisdata$Did_Graduate, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
-```
-
-The intersection of the aforementioned findings indicate that Hispanic
-and Non-Hispanic students attend the same amount of terms, but Hispanic
-students graduate at a significantly lower rate.
-
-#### Transfer Status
-
-Channel Islands receives lots of transfer students due to the
-institution's well-established relationships with local community
-colleges and the institution's relatively low cost. This is supported by
-the data we received below.
-
-```{r}
-#| message: false
-#| warning: false
-hdata <- ddata[ddata$Is_Transfer == 0, ]
-tdata <- ddata[ddata$Is_Transfer == 1, ]
-```
-
-It was found that student's who started their academic journey at
-Channel Islands attend more terms (*M* = 5.96) than those who transfer
-(*M* = 5.15) with a significant difference, *t*(1282) = 4.957, *p* \<
-.001. Interestingly, this difference was not as large as expected as
-those who transfer should theoretically need far less classes than those
-who start at the institution.
-
-```{r}
-#| message: false
-#| warning: false
-#| eval: false
-summary(hdata$Terms_Attended) # Home Terms Mean
-summary(tdata$Terms_Attended) # Transfer Terms Mean
-t.test(tdata$Terms_Attended, hdata$Terms_Attended, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
-```
-
-When taking into account graduation rates, the lack of disparity between
-terms attended for transfer and non-transfer student becomes apparent.
-Students who started at Channel Islands graduate 35.61% of the time
-whereas those who transfer graduate 51.98% of the time. A t-test
-determined that this was a significant difference, *t*(1552) = 6.61, *p*
-\> .001.
-
-```{r}
-#| eval: false
-#| message: false
-#| warning: false
-summary(hdata$Did_Graduate) # Home Graduation Mean
-summary(tdata$Did_Graduate) # Transfer Graduation Mean
-t.test(tdata$Did_Graduate, hdata$Did_Graduate, alternative = "two.sided", var.equal = FALSE, conf.level = 0.95)
-```
-
-#### Majors
-
-The Computer Science Department at Channel Islands includes the majors
-of Computer Science, Mechatronics and Information Technology. Due to
-some students double majoring or changing programs the data includes
-majors that are outside this category.
-
-Our major count was:
-
-```{r}
-#| echo: false
-#| message: false
-#| warning: false
-dfmajor <- as.data.frame(c(ddata$major1_Descr, ddata$major2_Descr, ddata$major3_Descr)) # Combines student's majors into a DF
-dfmajor <- dfmajor %>% # Removes NA Values
-            na.omit(mutate(dfmajor = str_trim(c(ddata$major1, ddata$major2, ddata$major3))))
-colnames(dfmajor) <- c("Major") # Renames Column
-dfmajor <- dfmajor %>% # Creates count of majors
-            count(Major)
-print(dfmajor)
-```
-
-Due to the small sample size, majors with under 20 students were
-excluded for the following chart:
+the two groups, (*p* \< .01).
 
 #### Gender and Hispanic Status
 
-It was found that Hispanic males graduate **39.44%** of the time,
-whereas their Non-Hispanic male counterparts graduate **48.54%** of the
-time. Similarly, Hispanic females graduate **29.13%** of the time and
-Non-Hispanic females graduate **53.33%** of the time. This showcases a
+It was found that Hispanic males graduate 43.85**%** of the time,
+whereas their Non-Hispanic male counterparts graduate 50.01**%** of the
+time. Similarly, Hispanic females graduate 31.88**%** of the time and
+Non-Hispanic females graduate 49.50**%** of the time. This showcases a
 large disparity between Hispanic and Non-Hispanic students. In addition,
-there is a **\~10%** difference in graduation rates among Hispanic males
-and females, whereas this disparity is not seen in their Non-Hispanic
-counterparts.s
+there is a 11.97**%** difference in graduation rates among Hispanic
+males and females, whereas this disparity is not seen in their
+Non-Hispanic counterparts.s
 
 ```{r}
-#| eval: false
-#| message: false
-#| warning: false
-  mhisdata <- mdata[mdata$Is_Hispanic == 1, ] # Male Hispanic 
-  fhisdata <- fdata[fdata$Is_Hispanic == 1, ] # Female Hispanic
+#| include: false
+mhisdata <- mdata[mdata$Is_Hispanic == "Hispanic", ] # Male Hispanic
+fhisdata <- fdata[fdata$Is_Hispanic == "Hispanic", ] # Female Hispanic
   
-  mnhisdata <- mdata[mdata$Is_Hispanic == 0, ] # Male Not Hispanic
-  fnhisdata <- fdata[fdata$Is_Hispanic == 0, ] # Female Not Hispanic
-  
-  # Gender by Hispanic Status
-    summary(mhisdata$Did_Graduate) # Male Hispanic 0.3944
-    summary(fhisdata$Did_Graduate) # Female Hispanic 0.2913
-    
-    summary(mnhisdata$Did_Graduate) # Male Not Hispanic: 0.4854
-    summary(fnhisdata$Did_Graduate) # Female Not Hispanic: 0.5333
+mnhisdata <- mdata[mdata$Is_Hispanic == "Non Hispanic", ] # Male Not Hispanic
+fnhisdata <- fdata[fdata$Is_Hispanic == "Non Hispanic", ] # Female Not Hispanic
+
+nrow(mhisdata[mhisdata$Did_Graduate == "Graduated", ]) / nrow(mhisdata) # Male Hispanic
+nrow(fhisdata[fhisdata$Did_Graduate == "Graduated", ]) / nrow(fhisdata) # Female Hispanic
+nrow(mnhisdata[mnhisdata$Did_Graduate == "Graduated", ]) / nrow(mnhisdata) # Male Not Hispanic
+nrow(fnhisdata[fnhisdata$Did_Graduate == "Graduated", ]) / nrow(fnhisdata) # Female Not Hispanic
 ```
 
 ### Logistic Regression
@@ -1125,9 +1017,6 @@ students, and compared to students who received no tutoring, those with
 1–5 tutoring sessions had 2.87 times higher odds of graduating, those
 with 6–10 sessions had 4.99 times higher odds, and those with 11 or more
 sessions had 8.07 times higher odds.
-
-```{r}
-```
 
 ### Survival Analysis
 
