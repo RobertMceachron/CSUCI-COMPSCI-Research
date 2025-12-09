@@ -86,7 +86,7 @@ analyzed enrollment and graduation rates for different intersectional
 demographics of college students in computing degrees from the MIDFIELD
 database. Combined with historical context analysis, the goal of the
 study was to analyze trends in computing degree enrollment and
-graduation from 1987 to 2018.
+graduation from 1987 to 2018.  Overall, the study found that all demographic groups had lower levels of graduation compared to enrollment.  Graduation rates of white women declined sharply after 1990, graduation rates of Black women sharply declined after 1995, graduation rates of Asian women steadily declined after 1999, Hispanic women consistently represented less than 2% of the population of computing graduates, and there were many years where Native American women did not graduate from computing programs at all.  White men represented the largest demographic of computing graduates (between 45.2% and 71.8% of the total population of computing graduates), followed by Asian men at around 10%.  Graduation rates for Black men remained below 5% from 2005 onward, and graduation rates of Hispanic men were consistently less than 6%.  There were many years where Native American men had no graduates from computing degrees.  Historical context analysis revealed more about the responses to declines in minority enrollment and graduation, rather than what actually caused those declines.  There was much discussion about the creation of professional organizations and conferences dedicated to fostering a sense of belonging among minority women in computing.
 
 ## Research Questions
 
