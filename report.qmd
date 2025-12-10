@@ -80,13 +80,76 @@ a whole.
 
 There has been much prior work examining the factors behind minority
 graduation in computer science and technology-related degrees in the
-United States. [Lunn et
+United States. This literature review will summarize the findings of a
+few studies that address this topic more generally, as well as a few
+additional studies that use logistic regression in their methods.
+
+[Lunn et
 al.](https://dl-acm-org.ezproxy.csuci.edu/doi/abs/10.1145/3445985)
 analyzed enrollment and graduation rates for different intersectional
 demographics of college students in computing degrees from the MIDFIELD
 database. Combined with historical context analysis, the goal of the
 study was to analyze trends in computing degree enrollment and
-graduation from 1987 to 2018.  Overall, the study found that all demographic groups had lower levels of graduation compared to enrollment.  Graduation rates of white women declined sharply after 1990, graduation rates of Black women sharply declined after 1995, graduation rates of Asian women steadily declined after 1999, Hispanic women consistently represented less than 2% of the population of computing graduates, and there were many years where Native American women did not graduate from computing programs at all.  White men represented the largest demographic of computing graduates (between 45.2% and 71.8% of the total population of computing graduates), followed by Asian men at around 10%.  Graduation rates for Black men remained below 5% from 2005 onward, and graduation rates of Hispanic men were consistently less than 6%.  There were many years where Native American men had no graduates from computing degrees.  Historical context analysis revealed more about the responses to declines in minority enrollment and graduation, rather than what actually caused those declines.  There was much discussion about the creation of professional organizations and conferences dedicated to fostering a sense of belonging among minority women in computing.
+graduation from 1987 to 2018. Overall, the study found that all
+demographic groups had lower levels of graduation compared to
+enrollment. Graduation rates of white women declined sharply after 1990,
+graduation rates of Black women sharply declined after 1995, graduation
+rates of Asian women steadily declined after 1999, Hispanic women
+consistently represented less than 2% of the population of computing
+graduates, and there were many years where Native American women did not
+graduate from computing programs at all. White men represented the
+largest demographic of computing graduates (between 45.2% and 71.8% of
+the total population of computing graduates), followed by Asian men at
+around 10%. Graduation rates for Black men remained below 5% from 2005
+onward, and graduation rates of Hispanic men were consistently less than
+6%. There were many years where Native American men had no graduates
+from computing degrees. Historical context analysis revealed more about
+the responses to declines in minority enrollment and graduation, rather
+than what actually caused those declines. There was much discussion
+about the creation of professional organizations and conferences
+dedicated to fostering a sense of belonging among minority women in
+computing.
+
+[Lord et
+al.](https://ieeexplore-ieee-org.ezproxy.csuci.edu/document/6881755)
+compared trajectories of students in electrical engineering (EE) and
+computer engineering (CpE) programs by race/ethnicity and gender, also
+using the MIDFIELD database. Although EE and CpE programs are not
+necessarily "computing" programs, their curriculum is pretty
+computing-focused, and they struggle with similar lack of diversity. The
+population studied included students who matriculated directly into EE
+and CpE, students who chose EE or CpE after completing a First-Year
+Experience program, students who migrated into EE or CpE after being in
+other majors, and transfer students. The study found that EE and CpE
+programs are quite successful in attracting Black engineering students:
+30% and 12% of Black men in engineering start in EE and CpE
+respectively, and 22% and 12% of Black women in engineering start in EE
+and CpE respectively. These programs, however, struggle to maintain
+Black student participation through to graduation: 32% and 17% of Black
+men who start in EE and CpE graduate, respectively, and 35% and 14% of
+Black women who start in EE and CpE graduate, respectively. The authors
+suggest that negative outcomes for Black students in EE and CpE are
+likely due to socioeconomic differences, which "could masquerade as
+racial differences." Hispanic women are another underserved population
+in EE and CpE, according to the study. Hispanic women in engineering are
+unlikely to start in either program and graduate at significantly lower
+rates than Hispanic men in EE and CpE. To compare differences between
+transfer and non-transfer students, the researchers used "major
+stickiness" — the ratio of the number of students who graduate in a
+major to the number of students who ever declared that major — finding
+that transfer students across all racial/ethnic-gender groups were more
+likely to persist to graduation than non-transfer students. Finally,
+much of the discussion of this study was dedicated to postulating the
+underlying reasons behind the low participation of women in EE and CpE
+programs for all races/ethnicities. This was especially critical since
+the study found that although men and women graduated at similar rates
+across all races/ethnicities in EE, the six-year graduation rates for
+women in CpE were noticeably lower across all races/ethnicities. The
+authors argue that the low participation of women in EE and CpE programs
+is likely a result of underlying cultural issues within the disciplines,
+particularly the "distinctive hegemonic masculinity" found within EE
+(and by extension CpE, since CpE originated from EE) leading women to
+consistently underestimate their own capabilities in the disciplines.
 
 ## Research Questions
 
@@ -1120,7 +1183,7 @@ with beta values changing over time for the aforementioned predictors.
 Additionally, the assumption of censoring being non-informative was
 broken as well. This was due to the fact that graduation did have an
 impact on student's censoring with dropping out being a specific
-subgroup of interest. 
+subgroup of interest.
 
 ## Sample #2
 
@@ -1155,11 +1218,40 @@ Results
 
 Possible intervention demographics
 
-Due to the type and amount of data collected, the present research had numerous limitations. First, it was unclear why students did not graduate. Students’ reasons for dropping out were not collected, and we were subsequently unable to determine whether they transferred to another institution or simply took a break from their education. Second, the historical impact of COVID-19 could not be fully analyzed due to students who began their degree during or after this time still being enrolled. It is theorized that COVID-19 likely had a significant impact on graduation rates, and due to half of our data being collected after this historical event, it could explain a lot regarding graduation. Third, the extreme outliers in variables such as tutoring visits and unit load required binning, as these students did not represent the overall population. This likely resulted in a loss of information, which could have helped explain more of the variance in graduation. Lastly, variables such as GPA, classes taken each semester, and income level could have helped explain graduation. The variables were not included due to the sensitive nature of institutional data, but institutional researchers could further examine their effects. The limitations mentioned above limit the explanatory power and generalizability of our analyses, but future research can account for some of these variables. 
+Due to the type and amount of data collected, the present research had
+numerous limitations. First, it was unclear why students did not
+graduate. Students’ reasons for dropping out were not collected, and we
+were subsequently unable to determine whether they transferred to
+another institution or simply took a break from their education. Second,
+the historical impact of COVID-19 could not be fully analyzed due to
+students who began their degree during or after this time still being
+enrolled. It is theorized that COVID-19 likely had a significant impact
+on graduation rates, and due to half of our data being collected after
+this historical event, it could explain a lot regarding graduation.
+Third, the extreme outliers in variables such as tutoring visits and
+unit load required binning, as these students did not represent the
+overall population. This likely resulted in a loss of information, which
+could have helped explain more of the variance in graduation. Lastly,
+variables such as GPA, classes taken each semester, and income level
+could have helped explain graduation. The variables were not included
+due to the sensitive nature of institutional data, but institutional
+researchers could further examine their effects. The limitations
+mentioned above limit the explanatory power and generalizability of our
+analyses, but future research can account for some of these variables.
 
-Future research should compare graduation rates across departments to determine whether the significant predictors are specific to the Computer Science Department. Furthermore, examining parental and student income status could provide valuable insight into why students drop out. Statistical analyses such as Discrete-time Survival Analysis could help explain when students drop out of the program, as the Cox Proportional Hazards model run in the current research did not meet its assumptions. Lastly, Qualitative interviews could prove beneficial for identifying the stressors students have personally identified in the Computer Science Department and for validating or expanding the variables of interest. 
+Future research should compare graduation rates across departments to
+determine whether the significant predictors are specific to the
+Computer Science Department. Furthermore, examining parental and student
+income status could provide valuable insight into why students drop out.
+Statistical analyses such as Discrete-time Survival Analysis could help
+explain when students drop out of the program, as the Cox Proportional
+Hazards model run in the current research did not meet its assumptions.
+Lastly, Qualitative interviews could prove beneficial for identifying
+the stressors students have personally identified in the Computer
+Science Department and for validating or expanding the variables of
+interest.
 
-Conclusion Paragraph 
+Conclusion Paragraph
 
 # Other
 
