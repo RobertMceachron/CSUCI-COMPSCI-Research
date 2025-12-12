@@ -1189,11 +1189,84 @@ subgroup of interest.
 
 ### Inferential Statistics
 
-#### Hispanic Status
-
 #### Transfer Status
 
-#### Majors
+Students who graduated with another major (*n* = 88) remained in the
+computer science department for an average of 3.47 terms, whereas
+students who graduated with a degree in CS/IT/EMEC (*n* = 511) had an
+average of 7.39 terms. For students who graduated with another major,
+transfer students (*n* = 26) remained in the computer science department
+for an average of 2.23 terms, and non-transfer students (*n* = 62)
+averaged 3.98 terms. An independent samples t-test was conducted to
+compare the number of terms attended between non-transfer and transfer
+students. The results indicated a significant difference in the mean
+terms attended, *t*(69.99) = 4.998, *p* \< .001. Non-transfer students
+attended significantly more terms on average compared to transfer
+students. Among the students who graduated with a degree in CS/IT/EMEC,
+transfer students (*n* = 351) averaged 6.59 terms, whereas non-transfer
+students (*n* = 160) had an average of 9.13 terms. An independent
+samples t-test was conducted to compare the number of terms attended
+between non-transfer and transfer students. The results revealed a
+significant difference in terms attended between the two groups,
+*t*(280.88) = 14.09, *p* \< .001. Non-transfer students attended more
+terms on average than transfer students.
+
+A chi-squared test of independence was conducted to examine the
+relationship between student status (Transfer vs. Non-Transfer) and
+graduation outcome (Graduated with another major vs. graduated with
+CS/IT/EMEC). Non-transfer students graduated with another major 62 times
+and with CS/IT/EMEC 160 times, while transfer students graduated with
+another major 26 times and with CS/IT/EMEC 351 times. The chi-square
+analysis showed a statistically significant association between student
+status and graduation outcome, χ²(1) = 47.65, *p* \< .001. Based on the
+observed counts, transfer students were more likely to graduate with a
+CS/IT/EMEC degree. In contrast, non-transfer students were relatively
+more likely to graduate with another major.
+
+#### Hispanic Status
+
+Among the students who graduated with another major (*n* = 88), 35
+identified as Hispanic and 53 were non-Hispanic. For students who
+graduated with a CS/IT/EMEC degree (*n* = 511), 179 were Hispanic, and
+332 were not Hispanic. A chi-squared test of independence indicated no
+significant association between ethnicity (Hispanic vs. non-Hispanic)
+and graduation outcome, χ²(1) = 0.54, *p* \> .05.
+
+For students who graduated with a CS/IT/EMEC degree, Hispanic students
+attended an average of 7.36 terms, while non-Hispanic students attended
+an average of 7.40 terms. An independent samples t-test indicated no
+significant difference in the number of terms attended between Hispanic
+and non-Hispanic students, *t*(368.07) = 0.215, *p* \> .05. Among
+students who graduated with another major, an independent samples t-test
+indicated no significant difference in the number of terms attended
+between Hispanic (*M* = 3.91) and non-Hispanic students (*M* = 3.17),
+*t*(70.03) = -1.768, *p* \> .05.
+
+#### Tutoring
+
+For students who graduated with a CS/IT/EMEC degree, the distribution of
+tutoring level was as follows: 125 students attended tutoring, 167
+attended low tutoring (1 to 5 visits), 72 attended moderate tutoring (6
+to 10 visits), and 147 attended high tutoring (11 or more). Among
+students who graduated with another major, 29 students attended no
+tutoring, 34 attended low tutoring, 8 attended moderate tutoring, and 17
+attended high tutoring. A chi-squared test of independence indicated no
+significant association between graduation type and tutoring level,
+χ²(3) = 6.75, *p* \>.05. Additionally, a chi-squared test of
+independence indicated no significant association between graduation
+type and whether students attended tutoring (Yes Tutoring or No
+Tutoring), with 386 CS/IT/EMEC graduates and 59 graduates with another
+major attending tutoring, and 125 CS/IT/EMEC graduates and 29 graduates
+with another major not attending, χ²(1) = 2.41, *p* \> .05.
+
+#### Gender
+
+For students who graduated with a CS/IT/EMEC degree, 72 identified as
+female and 439 as male. According to institutional data, 67.8% of CSUCI
+students in 2023 were female. A one-sample proportion test comparing the
+proportion of female graduates within the computer science department to
+the CSUCI female proportion revealed a statistically significant
+difference, χ²(1) = 675.22, *p* \< .001.
 
 ### Logistic Regression
 
@@ -1201,7 +1274,7 @@ Hispanic identity, gender, transfer status, tutoring visits, enrollment
 status, and housing were used to predict graduation. The variance
 inflation factor (VIF) values ranged from 1.02 - 1.13, indicating no
 multicollinearity. The overall model significantly improved prediction
-over the null model, X² (9) = 473.279, p \< .001, with an overall
+over the null model, X²(9) = 473.279, *p* \< .001, with an overall
 classification accuracy of 85.14%. The model accounted for 11.5% (Cox
 and Snell R² = .115) to 20.3% (Nigelkerke R² = .203) of the variance in
 graduation. In this sample of 599 students, tutoring and transfer status
@@ -1214,9 +1287,57 @@ significant predictors of graduation.
 
 # Discussion
 
-Results
+The results of this study highlight several important patterns related
+to graduation among students in the CSU Channel Islands Computer Science
+Department. In Sample 1, which includes all students who entered the
+department regardless of graduation outcome, males and females persisted
+for a similar number of terms and graduated at similar rates. A total of
+170 female students and 921 males were enrolled in the computer science
+program. Among these students, 72 females and 439 males graduated with a
+CS/IT/EMEC degree. However, representation among graduates revealed a
+major disparity. A one-sample proportion test showed that the percentage
+of female graduates (14.1%) was significantly lower than the
+institutional female graduation rate of 67.8%, χ²(1) = 675.22, *p* \<
+.001. The data suggest that underrepresentation of women may arise
+primarily at entry into the major. Potential interventions to promote
+female participation could include mentoring programs pairing female
+students with current CS majors or alumnae and early outreach programs
+targeting first-year female students to increase interest in the field.
 
-Possible intervention demographics
+In Sample 1, Hispanic students graduated at a significantly lower rate
+(41.92%) than non-Hispanic students (50%), χ²(1, n = 1091) = 6.49, *p*
+\< .001. Hispanic males and females showed lower graduation rates than
+non-Hispanic students. However, Hispanic females graduate at the lowest
+rate overall, which may indicate a combined effect of gender and
+ethnicity. Despite these differences, Hispanic students attended a
+similar number of terms as non-Hispanic students. In Sample 2,
+graduation rates did not differ significantly by Hispanic status. These
+findings suggest that disparities may emerge during the early academic
+stages. Potential interventions to support Hispanic students' graduation
+could include targeted support groups for this demographic within the
+computer science department. Additionally, Hispanic students who are
+starting the program may benefit from courses highlighting
+accomplishments from those from racially diverse backgrounds.
+
+Transfer status also played an important role, as transfer students had
+higher odds of graduating, were more likely than non-transfer students
+to complete a CS/IT/EMEC degree, and completed their degrees in fewer
+terms on average than non-transfer students. Tutoring demonstrated a
+strong relationship with graduation in Sample 1, with increased tutoring
+visits associated with higher odds of completing a degree. However, in
+Sample 2, tutoring was not a significant predictor of whether a student
+graduated with or without a degree from the computer science department.
+These patterns were further supported by logistic regression, which
+showed that Hispanic identity, part-time status, housing, transfer
+status, and tutoring significantly predicted graduation. Whereas in
+Sample 2, the logistic regression analysis differences by gender and
+Hispanic identity were no longer significant. This suggests that
+demographic inequities may emerge earlier in a student’s academic
+career, whereas transfer students and tutoring remain consistent
+predictors of degree completion. Computer science students may benefit
+from mandatory tutoring sessions or workshops specifically designed to
+promote proficiency in academic milestones (e.g., coding in R or Python,
+mathematical reasoning behind statistical approaches, etc).
 
 Due to the type and amount of data collected, the present research had
 numerous limitations. First, it was unclear why students did not
@@ -1250,8 +1371,6 @@ Lastly, Qualitative interviews could prove beneficial for identifying
 the stressors students have personally identified in the Computer
 Science Department and for validating or expanding the variables of
 interest.
-
-Conclusion Paragraph
 
 # Other
 
